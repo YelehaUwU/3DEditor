@@ -18,7 +18,8 @@ Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is des
    
     ```ini
     <resource src="editor" />
-5. Restart your MTA:SA server to ensure that the new resource is loaded and available for use.
+5. Make sure to install the dependencies (( [DGS](https://github.com/thisdp/dgs) is required to use the editor ))
+6. Restart your MTA:SA server to ensure that the new resource is loaded and available for use.
 
 ## Usage
 
