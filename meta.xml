@@ -1,0 +1,23 @@
+<script>
+	<script src="client.lua" type="client" cache="false"/>
+	<script src="server.lua" type="server"/>
+
+	<export function="startEdit" type="server"/>
+	<export function="startEdit" type="client"/>
+
+	<file src="files/x.png" type="client"/>
+	<file src="files/y.png" type="client"/>
+	<file src="files/z.png" type="client"/>
+	<file src="files/xr.png" type="client"/>
+	<file src="files/yr.png" type="client"/>
+	<file src="files/zr.png" type="client"/>
+	<file src="files/xs.png" type="client"/>
+	<file src="files/ys.png" type="client"/>
+	<file src="files/zs.png" type="client"/>
+
+	<file src="files/move.png" type="client"/>
+	<file src="files/rotate.png" type="client"/>
+	<file src="files/size.png" type="client"/>
+	<file src="files/bin.png" type="client"/>
+	<file src="files/save.png" type="client"/>
+</script>
