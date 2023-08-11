@@ -1,5 +1,7 @@
 # <img src="https://multitheftauto.com/mtasa_icon_hq.png" alt="MTA:SA Logo" width="20"> MTA:SA 3D Editor Resource
 
+**Jazyk: [English](README.md) | [Čeština](README-cz.md)**
+
 Vítejte v repozitáři MTA:SA 3D Editoru! Tento zdrojový kód poskytuje snadno použitelný nástroj pro editaci 3D objektů ve hře Multi Theft Auto: San Andreas (MTA:SA). Ať už jste zkušený vývojář pro MTA nebo teprve začínáte, tento zdrojový kód si klade za cíl zjednodušit proces editace 3D objektů na vašem MTA serveru.
 
 ## Funkce
