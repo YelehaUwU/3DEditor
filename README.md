@@ -72,7 +72,7 @@ This project is licensed under the [GNU General Public License version 3.0](LICE
 
 ## Credits
 
-- [Derbosik](https://github.com/Derbosik) & waves - Lead Developers
+- [Derbosik](https://github.com/Derbosik) & [waves](https://github.com/wavesk) - Lead Developers
 
 Special thanks to the MTA community for their support and inspiration.
 
