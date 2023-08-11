@@ -37,7 +37,8 @@ function startEdit(elementik)
 	bSize = DGS:dgsCreateImage( 930/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/size.png", false )
 	bBin = DGS:dgsCreateImage( 1010/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/bin.png", false )
 	bSave = DGS:dgsCreateImage( 1090/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/save.png", false )
-	info = DGS:dgsCreateLabel(700/1920*sx, 1000/1080*sy, 0/1920*sx, 0/1080*sy, "EDITOR \nPri držaní tlačítka SHIFT sa posúvanie zrýchli a pri držaní tlačítka ALT sa posúvanie spomalí",false)
+	info = DGS:dgsCreateLabel(700/1920*sx, 1000/1080*sy, 0/1920*sx, 0/1080*sy, "EDITOR \nHold down SHIFT to move faster and hold down ALT to move slower",false)
+	--info = DGS:dgsCreateLabel(700/1920*sx, 1000/1080*sy, 0/1920*sx, 0/1080*sy, "EDITOR \nPri držaní tlačítka SHIFT sa posúvanie zrýchli a pri držaní tlačítka ALT sa posúvanie spomalí",false)
 
 	addEventHandler("onDgsMouseClick",root,function(button,state)
 		if button=="left" and state=="up" then
