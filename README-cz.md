@@ -19,7 +19,7 @@ Vítejte v repozitáři MTA:SA 3D Editoru! Tento zdrojový kód poskytuje snadno
 4. Přidejte zdrojový kód do konfiguračního souboru vašeho serveru (`mtaserver.conf`) pod sekci `resources`:
 
     ```ini
-    <resource src="editor" />
+    <resource src="3DEditor" />
     ```
 
 5. Ujistěte se, že máte nainstalované závislosti (pro použití 3D Editoru je vyžadováno [DGS](https://github.com/thisdp/dgs)).
