@@ -78,4 +78,4 @@ Special thanks to the MTA community for their support and inspiration.
 
 ---
 
-We hope you enjoy using the MTA:SA 3D Object Editor Resource! If you encounter any issues or have questions, please don't hesitate to [open an issue](https://github.com/Derbosik/editor/issues). Happy object editing!
+We hope you enjoy using the MTA:SA 3D Object Editor Resource! If you encounter any issues or have questions, please don't hesitate to [open an issue](https://github.com/Derbosik/3DEditor/issues). Happy object editing!
