@@ -11,14 +11,14 @@ Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is des
 
 ## Installation
 
-1. Download the latest version of the resource from the [Releases](https://github.com/Derbosik/editor/releases) section.
+1. Download the latest version of the resource from the [Releases](https://github.com/Derbosik/3DEditor/releases) section.
 2. Extract the downloaded archive.
 3. Place the extracted folder in the `resources` directory of your MTA:SA server.
 4. Add the resource to your server's configuration file (`mtaserver.conf`) under the `resources` section:
    
     ```ini
     <resource src="editor" />
-5. Make sure to install the dependencies (( [DGS](https://github.com/thisdp/dgs) is required to use the editor ))
+5. Make sure to install the dependencies (( [DGS](https://github.com/thisdp/dgs) is required to use the 3DEditor ))
 6. Restart your MTA:SA server to ensure that the new resource is loaded and available for use.
 
 ## Usage
@@ -33,7 +33,7 @@ Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is des
     ```lua
     function test()
        local obj = createObject(2761, 0, 0, 0)
-       exports.editor:startEdit(element)
+       exports.3DEditor:startEdit(element)
     end
     addEventHandler("onClientResourceStart", resourceRoot, test)
 
@@ -43,7 +43,7 @@ Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is des
     ```lua
     function test(player)
        local obj = createObject(2761, 0, 0, 0)
-       exports.editor:startEdit(element, player)
+       exports.3DEditor:startEdit(element, player)
     end
     addCommandHandler("testing", test)
 
@@ -60,7 +60,7 @@ Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is des
           saveFurniturePosition(element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
        end
     end
-    addEventHandler("editor:savedObject", root, listener)
+    addEventHandler("3DEditor:savedObject", root, listener)
 
 ## Contributing
 
