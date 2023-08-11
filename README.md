@@ -5,7 +5,7 @@ Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is des
 ## Features
 
 - **Intuitive Interface:** The 3D Object Editor comes with a user-friendly interface that makes editing objects a breeze.
-- **Real-time Preview:** See your changes in real-time as you modify the object's properties, ensuring you get the desired look.
+- **Real-time Preview:** See your changes in real-time as you modify the object's properties.
 - **Customization:** Adjust object properties such as position, rotation, and scale.
 - **Export Options:** Deeply integrate the resource into your server per your liking.
 
@@ -51,7 +51,7 @@ Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is des
 
 5. Once you're satisfied with your creation, use the save button.
 
-6. A server and client event is going to be triggered, this is where you need to check for the sourceResource and apply your changes.
+6. A server and client event is going to be triggered, this is where you need to check for the (res) and apply your changes.
 
     You can implement saving to MySQL/SQLite or just manipulate with the values however you please.
     ```lua
