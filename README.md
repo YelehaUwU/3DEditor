@@ -1,5 +1,7 @@
 # <img src="https://multitheftauto.com/mtasa_icon_hq.png" alt="MTA:SA Logo" width="20"> MTA:SA 3D Object Editor Resource
 
+**Language: [English](README.md) | [Čeština](README-cz.md)**
+
 Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is designed to provide an easy-to-use tool for editing 3D objects within Multi Theft Auto: San Andreas (MTA:SA). Whether you're a seasoned MTA developer or just starting out, this resource aims to simplify the process of editing 3D objects on your MTA server.
 
 ## Features
