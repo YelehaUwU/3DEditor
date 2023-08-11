@@ -1,4 +1,4 @@
-# <img src="https://multitheftauto.com/mtasa_icon_hq.png" alt="MTA:SA Logo" width="20"> MTA:SA 3D Object Editor Resource
+# <img src="https://multitheftauto.com/mtasa_icon_hq.png" alt="MTA:SA Logo" width="20"> MTA:SA 3D Editor Resource
 
 **Language: [English](README.md) | [Čeština](README-cz.md)**
 
