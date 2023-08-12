@@ -347,7 +347,7 @@ end
 
 --[[
 
-	Sekcia dôležitých funkcií
+	Dependancies
 
 ]]
 
