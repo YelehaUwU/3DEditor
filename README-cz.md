@@ -37,7 +37,7 @@ Vítejte v repozitáři MTA:SA 3D Editoru! Tento zdrojový kód poskytuje snadno
     ```lua
     function test()
        local obj = createObject(2761, 0, 0, 0)
-       exports.3DEditor:startEdit(element)
+       exports.3DEditor:startEdit(obj)
     end
     addEventHandler("onClientResourceStart", resourceRoot, test);
     ```
@@ -46,7 +46,7 @@ Vítejte v repozitáři MTA:SA 3D Editoru! Tento zdrojový kód poskytuje snadno
     ```lua
     function test(player)
        local obj = createObject(2761, 0, 0, 0)
-       exports.3DEditor:startEdit(element, player)
+       exports.3DEditor:startEdit(obj, player)
     end
     addCommandHandler("testing", test)
 
