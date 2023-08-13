@@ -73,6 +73,8 @@ function startEdit(elementik)
 					setElementPosition(element, dx, dy, dz)
 					setElementRotation(element, drx, dry, drz)
 					setObjectScale(element, dsx, dsy, dsz)
+     if not isElementLocal(element) then triggerServerEvent("editor:savedObject", localPlayer, sourceResource, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz) end
+					triggerEvent("editor:savedObject", localPlayer, sourceResource, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz)
 					closeMenu(false)
 				end
 			elseif source == bSave then
