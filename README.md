@@ -35,7 +35,7 @@ Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is des
     ```lua
     function test()
        local obj = createObject(2761, 0, 0, 0)
-       exports.3DEditor:startEdit(element)
+       exports.3DEditor:startEdit(obj)
     end
     addEventHandler("onClientResourceStart", resourceRoot, test)
 
@@ -45,7 +45,7 @@ Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is des
     ```lua
     function test(player)
        local obj = createObject(2761, 0, 0, 0)
-       exports.3DEditor:startEdit(element, player)
+       exports.3DEditor:startEdit(obj, player)
     end
     addCommandHandler("testing", test)
 
