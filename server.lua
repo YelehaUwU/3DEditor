@@ -15,11 +15,9 @@ function startEdit(element, controller)
 end
 
 function savedObject(sourceResource, element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
-	if not isElementLocal(element) then
-		setElementPosition(element, cx, cy, cz)
-		setElementRotation(element, rx, ry, rz)
-		setObjectScale(element, sx, sy, sz)
-	end
+	setElementPosition(element, cx, cy, cz)
+	setElementRotation(element, rx, ry, rz)
+	setObjectScale(element, sx, sy, sz)
 end
 addEvent("editor:savedObject", true)
 addEventHandler("editor:savedObject", root, savedObject)
