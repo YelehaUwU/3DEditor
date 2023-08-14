@@ -21,9 +21,7 @@ Vítejte v repozitáři MTA:SA 3D Editoru! Tento zdrojový kód poskytuje snadno
     ```ini
     <resource src="3DEditor" />
     ```
-
-5. Ujistěte se, že máte nainstalované závislosti (pro použití 3D Editoru je vyžadováno [DGS](https://github.com/thisdp/dgs)).
-6. Restartujte váš MTA:SA server, aby byl nový zdrojový kód nahrán a dostupný k použití.
+5. Restartujte váš MTA:SA server, aby byl nový zdrojový kód nahrán a dostupný k použití.
 
 ## Použití
 
