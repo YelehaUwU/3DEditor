@@ -10,7 +10,6 @@
 	You should have received a copy of the GNU General Public License along with 3DEditor. If not, see https://github.com/Derbosik/3DEditor/blob/main/LICENSE. 
 ]]
 
-local DGS = exports.dgs
 local editing, rotating, sizing = false, false, false
 local x,y,z = false,false,false
 local element = nil
@@ -40,31 +39,33 @@ function startEdit(elementik)
 		addEventHandler("onClientRender", root, drawControls)
 	end
 
-	bMove = DGS:dgsCreateImage( 770/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/move.png", false )
-	bRotate = DGS:dgsCreateImage( 850/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/rotate.png", false )
-	bSize = DGS:dgsCreateImage( 930/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/size.png", false )
-	bBin = DGS:dgsCreateImage( 1010/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/bin.png", false )
-	bSave = DGS:dgsCreateImage( 1090/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/save.png", false )
-	info = DGS:dgsCreateLabel(700/1920*sx, 1000/1080*sy, 0/1920*sx, 0/1080*sy, "EDITOR \nHold down SHIFT to move faster and hold down ALT to move slower",false)
-	--info = DGS:dgsCreateLabel(700/1920*sx, 1000/1080*sy, 0/1920*sx, 0/1080*sy, "EDITOR \nPri držaní tlačítka SHIFT sa posúvanie zrýchli a pri držaní tlačítka ALT sa posúvanie spomalí",false)
+	bMove = guiCreateStaticImage( 770/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/move.png", false )
+	bRotate = guiCreateStaticImage( 850/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/rotate.png", false )
+	bSize = guiCreateStaticImage( 930/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/size.png", false )
+	bBin = guiCreateStaticImage( 1010/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/bin.png", false )
+	bSave = guiCreateStaticImage( 1090/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/save.png", false )
+	info = guiCreateLabel(700/1920*sx, 1000/1080*sy, 0/1920*sx, 0/1080*sy, "EDITOR \nHold down SHIFT to move faster and hold down ALT to move slower",false)
+	--info = guiCreateLabel(700/1920*sx, 1000/1080*sy, 0/1920*sx, 0/1080*sy, "EDITOR \nPri držaní tlačítka SHIFT sa posúvanie zrýchli a pri držaní tlačítka ALT sa posúvanie spomalí",false)
 
-	addEventHandler("onDgsMouseClick",root,function(button,state)
+	showCursor(true)
+
+	addEventHandler("onClientGUIClick",root,function(button,state)
 		if button=="left" and state=="up" then
 			if source == bMove then
-				DGS:dgsSetAlpha(bRotate, 1)
-				DGS:dgsSetAlpha(bSize, 1)
+				guiSetAlpha(bRotate, 1)
+				guiSetAlpha(bSize, 1)
 				rotating = false
 				editing = true
 				sizing = false
 			elseif source == bRotate then
-				DGS:dgsSetAlpha(bMove, 1)
-				DGS:dgsSetAlpha(bSize, 1)
+				guiSetAlpha(bMove, 1)
+				guiSetAlpha(bSize, 1)
 				rotating = true
 				editing = false
 				sizing = false
 			elseif source == bSize then
-				DGS:dgsSetAlpha(bRotate, 1)
-				DGS:dgsSetAlpha(bMove, 1)
+				guiSetAlpha(bRotate, 1)
+				guiSetAlpha(bMove, 1)
 				rotating = false
 				editing = false
 				sizing = true
@@ -150,21 +151,21 @@ function drawControls()
 	end
 end
 
-addEventHandler( "onDgsMouseEnter", root, 
+addEventHandler( "onClientMouseEnter", root, 
 	function(aX, aY)
 		if source == bMove or source == bRotate or source == bSize or source == bBin or source == bSave then
-			DGS:dgsSetAlpha(source, 0.65)
+			guiSetAlpha(source, 0.65)
 		end
 	end
 )
 
-addEventHandler( "onDgsMouseLeave", root, 
+addEventHandler( "onClientMouseLeave", root, 
 	function(aX, aY)
 		if source == bMove or source == bRotate or source == bSize or source == bBin or source == bSave then
 			if source == bMove and editing then return end
 			if source == bRotate and rotating then return end
 			if source == bSize and sizing then return end
-			DGS:dgsSetAlpha(source, 1)
+			guiSetAlpha(source, 1)
 		end
 	end
 )
@@ -184,6 +185,7 @@ function closeMenu()
 	destroyElement(bBin)
 	destroyElement(bSave)
 	destroyElement(info)
+	showCursor(false)
 end
 
 function click( button, state, absoluteX, absoluteY, worldX, worldY, worldZ, clickedElement )
@@ -260,25 +262,25 @@ function cursorMove(_,_,ax,ay)
 		if editing then
 			if not (cx or cy or cz) then return end
 			if x == true then
-				if distance1>=distance2 and cx<maxXYZ then
+				if distance1>=distance2 then
 					setElementPosition(element, cx + moveSpeed, cy, cz)
-				elseif cx>-maxXYZ and distance1<distance2 then
+				else
 					setElementPosition(element, cx - moveSpeed, cy, cz)
 				end
 				local ix, iy =  getScreenFromWorldPosition ( dx, dy, dz )
 				setCursorPosition ( ix, iy )
 			elseif y == true then
-				if distance1>=distance2 and cy<maxXYZ then
+				if distance1>=distance2 then
 					setElementPosition(element, cx, cy + moveSpeed, cz)
-				elseif cy>-maxXYZ and distance1<distance2 then
+				else
 					setElementPosition(element, cx, cy - moveSpeed, cz)
 				end
 				local ix, iy =  getScreenFromWorldPosition ( fx, fy, fz )
 				setCursorPosition ( ix, iy )
 			elseif z == true then
-				if distance1>=distance2 and cz<maxXYZ then
+				if distance1>=distance2 then
 					setElementPosition(element,cx, cy, cz + moveSpeed)
-				elseif cz>-maxXYZ and distance1<distance2 then
+				else
 					setElementPosition(element, cx, cy, cz - moveSpeed)
 				end
 				local ix, iy =  getScreenFromWorldPosition ( ux, uy, uz )
@@ -313,25 +315,25 @@ function cursorMove(_,_,ax,ay)
 		elseif sizing then
 			local s1, s2, s3 = getObjectScale( element )
 			if x == true then
-				if distance1>=distance2 and s1<maxSize then
+				if distance1>=distance2 then
 					setObjectScale(element, s1 + sizeSpeed, s2, s3)
-				elseif s1>minSize and distance1<distance2  then
+				else
 					setObjectScale(element, s1 - sizeSpeed, s2, s3)
 				end
 				local ix, iy =  getScreenFromWorldPosition ( dx, dy, dz )
 				setCursorPosition ( ix, iy )
 			elseif y == true then
-				if distance1>=distance2 and s2<maxSize then
+				if distance1>=distance2 then
 					setObjectScale(element, s1, s2 + sizeSpeed, s3)
-				elseif s2>minSize and distance1<distance2  then
+				else
 					setObjectScale(element, s1, s2 - sizeSpeed, s3)
 				end
 				local ix, iy =  getScreenFromWorldPosition ( fx, fy, fz )
 				setCursorPosition ( ix, iy )
 			elseif z == true then
-				if distance1>=distance2 and s3<maxSize then
+				if distance1>=distance2 then
 					setObjectScale(element, s1, s2, s3 + sizeSpeed)
-				elseif s3>minSize and distance1<distance2 then
+				else
 					setObjectScale(element, s1, s2, s3 - sizeSpeed)
 				end
 				local ix, iy =  getScreenFromWorldPosition ( ux, uy, uz )
