@@ -16,9 +16,6 @@ local element = nil
 local sx, sy = guiGetScreenSize()
 
 local XYZlength = .5
-local maxSize = 1.2
-local minSize = .9
-local maxXYZ = .2
 
 local t = false
 local oldX, oldY
