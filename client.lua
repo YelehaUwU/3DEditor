@@ -13,7 +13,7 @@
 local editing, rotating, sizing = false, false, false
 local x,y,z = false,false,false
 local element = nil
-local sx, sy = guiGetScreenSize()
+local sx, sy = guiGetScreenSize()	
 
 local XYZlength = .5
 
@@ -73,7 +73,7 @@ function startEdit(elementik)
 					setObjectScale(element, dsx, dsy, dsz)
                                         if not isElementLocal(element) then triggerServerEvent("editor:savedObject", localPlayer, sourceResource, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz) end
 					triggerEvent("editor:savedObject", localPlayer, sourceResource, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz)
-					closeMenu(false)
+					closeMenu()
 				end
 			elseif source == bSave then
 				if isElement(element) then
@@ -82,7 +82,7 @@ function startEdit(elementik)
 					local sx, sy, sz = getObjectScale(element)
 					if not isElementLocal(element) then triggerServerEvent("editor:savedObject", localPlayer, sourceResource, element, cx, cy, cz, rx, ry, rz, sx, sy, sz) end
 					triggerEvent("editor:savedObject", localPlayer, sourceResource, element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
-					closeMenu(false)
+					closeMenu()
 				end
 			end
 		end
