@@ -9,16 +9,10 @@
 
 	You should have received a copy of the GNU General Public License along with 3DEditor. If not, see https://github.com/Derbosik/3DEditor/blob/main/LICENSE. 
 ]]
-
-local editing, rotating, sizing = false, false, false
-local x,y,z = false,false,false
-local element = nil
-local sx, sy = guiGetScreenSize()	
-
+
+local sx, sy = guiGetScreenSize()
 local XYZlength = .5
 
-local t = false
-local oldX, oldY
 setCursorAlpha(255)
 
 function startEdit(elementik)
