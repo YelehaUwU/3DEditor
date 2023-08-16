@@ -340,7 +340,7 @@ function cursorMove(_,_,ax,ay)
 		end
 		setTimer(function()
 			t = false
-		end,50,1)
+		end,25,1)
 	elseif (not isCursorShowing()) then
 		setCursorAlpha(255)
 	end
