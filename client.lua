@@ -9,7 +9,8 @@
 
 	You should have received a copy of the GNU General Public License along with 3DEditor. If not, see https://github.com/Derbosik/3DEditor/blob/main/LICENSE. 
 ]]
-
+
+
 local sx, sy = guiGetScreenSize()
 local XYZlength = .5
 
@@ -36,7 +37,6 @@ function startEdit(elementik)
 	bBin = guiCreateStaticImage( 1010/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/bin.png", false )
 	bSave = guiCreateStaticImage( 1090/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/save.png", false )
 	info = guiCreateLabel(700/1920*sx, 1000/1080*sy, 0/1920*sx, 0/1080*sy, "EDITOR \nHold down SHIFT to move faster and hold down ALT to move slower",false)
-	--info = guiCreateLabel(700/1920*sx, 1000/1080*sy, 0/1920*sx, 0/1080*sy, "EDITOR \nPri držaní tlačítka SHIFT sa posúvanie zrýchli a pri držaní tlačítka ALT sa posúvanie spomalí",false)
 
 	showCursor(true)
 
@@ -65,7 +65,7 @@ function startEdit(elementik)
 					setElementPosition(element, dx, dy, dz)
 					setElementRotation(element, drx, dry, drz)
 					setObjectScale(element, dsx, dsy, dsz)
-                                        if not isElementLocal(element) then triggerServerEvent("editor:savedObject", localPlayer, sourceResource, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz) end
+                    if not isElementLocal(element) then triggerServerEvent("editor:savedObject", localPlayer, sourceResource, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz) end
 					triggerEvent("editor:savedObject", localPlayer, sourceResource, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz)
 					closeMenu()
 				end
@@ -183,7 +183,6 @@ function click( button, state, absoluteX, absoluteY, worldX, worldY, worldZ, cli
 	if isElement(element) then
 		if state == "down" then
 			local px,py,pz = getElementPosition( element )
-
 			if getKeyState( "mouse1" ) then
 				if (ix and iy and ix2 and iy2 and ix3 and iy3) then
 					if isMouseInPosition(ix-10,iy-10,20,20) or isMouseInPosition(ix3-10,iy3-10,20,20) or isMouseInPosition(ix2-10,iy2-10,20,20) then
@@ -194,14 +193,18 @@ function click( button, state, absoluteX, absoluteY, worldX, worldY, worldZ, cli
 						elseif isMouseInPosition(ix3-10,iy3-10,20,20) then
 							z = true
 						end
-						if not isEventHandlerAdded("onClientCursorMove", getRootElement( ), cursorMove) then
-							addEventHandler( "onClientCursorMove", getRootElement( ), cursorMove)
+						if not isEventHandlerAdded("onClientCursorMove", root, cursorMove) then
+							addEventHandler( "onClientCursorMove", root, cursorMove)
 						end
 						setElementAlpha(localPlayer, 150)
 						setCursorAlpha(0)
 					end
 				end
 				absX,absY = absoluteX,absoluteY
+			elseif getKeyState("mouse2") then
+				if not isEventHandlerAdded("onClientCursorMove", root, cursorRotate) then
+					addEventHandler( "onClientCursorMove", root, cursorRotate)
+				end
 			end
 		elseif state == "up" then
 			if x or y or z then
@@ -211,12 +214,24 @@ function click( button, state, absoluteX, absoluteY, worldX, worldY, worldZ, cli
 				x = false
 				y = false
 				z = false
-				removeEventHandler( "onClientCursorMove", getRootElement(), cursorMove)
+				removeEventHandler( "onClientCursorMove", root, cursorMove)
 			end
 		end
 	end
 end
-addEventHandler ( "onClientClick", getRootElement(), click )
+addEventHandler ( "onClientClick", root, click )
+
+function cursorRotate()
+	showCursor(false)
+end
+
+function cursorRestore(button, press)
+	if isElement(element) and button == "mouse2" and not press and isEventHandlerAdded("onClientCursorMove", root, cursorRotate) then
+		removeEventHandler( "onClientCursorMove", root, cursorRotate)
+		showCursor(true)
+	end
+end
+addEventHandler("onClientKey", root, cursorRestore)
 
 function cursorMove(_,_,ax,ay)
 	if getKeyState("mouse1") and isCursorShowing() and not t then
@@ -234,7 +249,7 @@ function cursorMove(_,_,ax,ay)
 				x = false
 				y = false
 				z = false
-				removeEventHandler( "onClientCursorMove", getRootElement(), cursorMove)
+				removeEventHandler( "onClientCursorMove", root, cursorMove)
 			end
 		end
 
