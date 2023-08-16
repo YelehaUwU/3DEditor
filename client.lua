@@ -202,9 +202,7 @@ function click( button, state, absoluteX, absoluteY, worldX, worldY, worldZ, cli
 				end
 				absX,absY = absoluteX,absoluteY
 			elseif getKeyState("mouse2") then
-				if not isEventHandlerAdded("onClientCursorMove", root, cursorRotate) then
-					addEventHandler( "onClientCursorMove", root, cursorRotate)
-				end
+				showCursor(false)
 			end
 		elseif state == "up" then
 			if x or y or z then
@@ -221,13 +219,8 @@ function click( button, state, absoluteX, absoluteY, worldX, worldY, worldZ, cli
 end
 addEventHandler ( "onClientClick", root, click )
 
-function cursorRotate()
-	showCursor(false)
-end
-
 function cursorRestore(button, press)
-	if isElement(element) and button == "mouse2" and not press and isEventHandlerAdded("onClientCursorMove", root, cursorRotate) then
-		removeEventHandler( "onClientCursorMove", root, cursorRotate)
+	if isElement(element) and button == "mouse2" and not press then
 		showCursor(true)
 	end
 end
