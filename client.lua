@@ -174,7 +174,6 @@ function closeMenu()
 	editing = true
 	sizing = false	
 	element = nil
-	meno = nil
 
 	destroyElement(bSize)
 	destroyElement(bRotate)
@@ -191,7 +190,7 @@ function click( button, state, absoluteX, absoluteY, worldX, worldY, worldZ, cli
 		if state == "down" then
 			local px,py,pz = getElementPosition( element )
 
-			if getKeyState( "mouse1" ) == true then
+			if getKeyState( "mouse1" ) then
 				if (ix and iy and ix2 and iy2 and ix3 and iy3) then
 					if isMouseInPosition(ix-10,iy-10,20,20) or isMouseInPosition(ix3-10,iy3-10,20,20) or isMouseInPosition(ix2-10,iy2-10,20,20) then
 						if isMouseInPosition(ix-10,iy-10,20,20) then
@@ -226,7 +225,7 @@ end
 addEventHandler ( "onClientClick", getRootElement(), click )
 
 function cursorMove(_,_,ax,ay)
-	if getKeyState("mouse1")==true and isCursorShowing() and not t then
+	if getKeyState("mouse1") and isCursorShowing() and not t then
 		t = true
 		local cx, cy, cz = getElementPosition(element)
 		local rx, ry, rz = getElementRotation(element)
@@ -248,10 +247,10 @@ function cursorMove(_,_,ax,ay)
 		local moveSpeed = 0.008
 		local rotateSpeed = 5
 		local sizeSpeed = 0.1
-		if getKeyState("lalt")==true then
+		if getKeyState("lalt") then
 			moveSpeed = 0.003
 			rotateSpeed = 2
-		elseif getKeyState("lshift")==true then
+		elseif getKeyState("lshift") then
 			moveSpeed = 0.03
 			rotateSpeed = 9
 		end	
