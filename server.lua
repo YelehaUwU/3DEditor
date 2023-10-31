@@ -11,7 +11,7 @@
 ]]
 
 function startEdit(element, controller)
-	if isElement(element) and isElement(controller) then triggerClientEvent(controller, "editor:startEdit", controller, element) end
+	if isElement(element) and isElement(controller) then triggerClientEvent(controller, "3DEditor:startEdit", controller, element, sourceResource) end
 end
 
 function savedObject(sourceResource, element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
@@ -19,5 +19,5 @@ function savedObject(sourceResource, element, cx, cy, cz, rx, ry, rz, sx, sy, sz
 	setElementRotation(element, rx, ry, rz)
 	setObjectScale(element, sx, sy, sz)
 end
-addEvent("editor:savedObject", true)
-addEventHandler("editor:savedObject", root, savedObject)
+addEvent("3DEditor:savedObject", true)
+addEventHandler("3DEditor:savedObject", root, savedObject)
