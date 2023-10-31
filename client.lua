@@ -10,17 +10,19 @@
 	You should have received a copy of the GNU General Public License along with 3DEditor. If not, see https://github.com/Derbosik/3DEditor/blob/main/LICENSE. 
 ]]
 
-
 local sx, sy = guiGetScreenSize()
 local XYZlength = .5
+local sourceResElement
 
 setCursorAlpha(255)
 
-function startEdit(elementik)
+function startEdit(elementik, sourceRes)
 	element = elementik
 	if not isElement(element) or getElementType(element) == "player" or getElementType(element) == "vehicle" or isElement(info) then
 		return false
 	end
+	sourceResElement = nil
+	if not sourceRes then sourceResElement = sourceResource else sourceResElement = sourceRes end
 	local pos = 100
 	local dx, dy, dz = getElementPosition(element)
 	local drx, dry, drz = getElementRotation(element)
@@ -65,8 +67,8 @@ function startEdit(elementik)
 					setElementPosition(element, dx, dy, dz)
 					setElementRotation(element, drx, dry, drz)
 					setObjectScale(element, dsx, dsy, dsz)
-                    if not isElementLocal(element) then triggerServerEvent("editor:savedObject", localPlayer, sourceResource, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz) end
-					triggerEvent("editor:savedObject", localPlayer, sourceResource, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz)
+                    if not isElementLocal(element) then triggerServerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz) end
+					triggerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz)
 					closeMenu()
 				end
 			elseif source == bSave then
@@ -74,16 +76,16 @@ function startEdit(elementik)
 					local cx, cy, cz = getElementPosition(element)
 					local rx, ry, rz = getElementRotation(element)
 					local sx, sy, sz = getObjectScale(element)
-					if not isElementLocal(element) then triggerServerEvent("editor:savedObject", localPlayer, sourceResource, element, cx, cy, cz, rx, ry, rz, sx, sy, sz) end
-					triggerEvent("editor:savedObject", localPlayer, sourceResource, element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
+					if not isElementLocal(element) then triggerServerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, cx, cy, cz, rx, ry, rz, sx, sy, sz) end
+					triggerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
 					closeMenu()
 				end
 			end
 		end
 	end)
 end
-addEvent("editor:startEdit", true)
-addEventHandler("editor:startEdit", root, startEdit)
+addEvent("3DEditor:startEdit", true)
+addEventHandler("3DEditor:startEdit", root, startEdit)
 
 function drawControls()
 	if (isElement(element)) then
