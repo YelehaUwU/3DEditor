@@ -1,7 +1,7 @@
 <script>
 	<script src="server.lua" type="server"/>
 	<script src="shared.lua" type="shared"/>
-	<script src="client.lua" type="client" cache="false"/>
+	<script src="client.lua" type="client"/>
 
 	<export function="startEdit" type="server"/>
 	<export function="startEdit" type="client"/>
