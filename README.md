@@ -9,6 +9,8 @@ Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is des
 - **Intuitive Interface:** The 3D Object Editor comes with a user-friendly interface that makes editing objects a breeze.
 - **Real-time Preview:** See your changes in real-time as you modify the object's properties.
 - **Customization:** Adjust object properties such as position, rotation, and scale.
+- **Made a mistake:** Undo and redo your edits, making sure you stay up-to-date with what you wanted.
+- **Everything to your liking:** Disable certain features if you feel like it.
 - **Export Options:** Deeply integrate the resource into your server per your liking.
 
 ## Installation
@@ -34,7 +36,7 @@ Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is des
     ```lua
     function test()
        local obj = createObject(935, 0, 0, 0)
-       exports.3DEditor:startEdit(obj)
+       exports.3DEditor:startEdit(obj, [disableMoving, disableRotating, disableScaling])
     end
     addEventHandler("onClientResourceStart", resourceRoot, test)
 
@@ -44,7 +46,7 @@ Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is des
     ```lua
     function test(player)
        local obj = createObject(935, 0, 0, 0)
-       exports.3DEditor:startEdit(obj, player)
+       exports.3DEditor:startEdit(obj, [disableMoving, disableRotating, disableScaling], player)
     end
     addCommandHandler("testing", test)
 
