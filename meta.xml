@@ -1,4 +1,10 @@
-<script>
+<meta>
+	<info author="Yeleha"
+	name="3DEditor"
+	description="Library for manipulating with objects"
+	version="3.5"
+	type="script"/>
+
 	<script src="server.lua" type="server"/>
 	<script src="shared.lua" type="shared"/>
 	<script src="client.lua" type="client"/>
@@ -21,4 +27,4 @@
 	<file src="files/size.png" type="client"/>
 	<file src="files/bin.png" type="client"/>
 	<file src="files/save.png" type="client"/>
-</script>
+</meta>
