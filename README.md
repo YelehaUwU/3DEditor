@@ -75,8 +75,8 @@ This project is licensed under the [GNU General Public License version 3.0](LICE
 
 ## Credits
 
-- [Derbosik](https://github.com/Derbosik) & [wavesk](https://github.com/wavesk) - Lead Developers
-- [Denas1](https://github.com/Denas1) - Giving ideas for improvements
+- [Derbosik](https://github.com/Derbosik) & [Nando](https://github.com/Fernando-A-Rocha) - Lead Developers
+- [wavesk](https://github.com/wavesk) & [Denas1](https://github.com/Denas1) - Giving ideas for improvements
 
 Special thanks to the MTA community for their support and inspiration.
 
