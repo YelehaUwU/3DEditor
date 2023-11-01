@@ -42,7 +42,7 @@ Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is des
 
     ```
 
-    Serverside Example (Make sure to make player the second argument, this defines the editor controller)
+    Serverside Example (Make sure to use all arguments, where player defines the editor controller)
     ```lua
     function test(player)
        local obj = createObject(935, 0, 0, 0)
