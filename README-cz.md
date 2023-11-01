@@ -54,7 +54,7 @@ Vítejte v repozitáři MTA:SA 3D Editoru! Tento zdrojový kód poskytuje snadno
 
 5. Jakmile jste spokojeni se svou tvorbou, použijte tlačítko pro uložení.
 
-6. Bude spuštěna událost na serveru a klientovi, zde je třeba kontrolovat zdrojový zdroj (res) (a "client" pokud na serveru) a aplikovat změny.
+6. Bude spuštěna událost na serveru a klientovi, zde je třeba kontrolovat zdroj (res) (a "client" pokud na serveru) a aplikovat změny.
 
     Můžete implementovat uložení do MySQL/SQLite nebo jednoduše manipulovat s hodnotami dle libosti.
     ```lua
