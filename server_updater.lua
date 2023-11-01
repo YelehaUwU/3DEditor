@@ -3,7 +3,14 @@ local repositoryName = "3DEditor"
 
 local localPath = "updates/"
 
-function checkForUpdates()
+local outputServerLog_ = outputServerLog
+local outputServerLog = function(message)
+    outputServerLog_("[ " .. repositoryName .. "] » " .. message)
+end
+
+local checkForUpdates, downloadUpdate, getVersion
+
+checkForUpdates = function()
     local apiUrl = "https://api.github.com/repos/" .. repositoryOwner .. "/" .. repositoryName .. "/releases/latest"
 
     fetchRemote(apiUrl, function(response, error)
@@ -15,19 +22,20 @@ function checkForUpdates()
                 local localVersion = getVersion()
 
                 if localVersion < tagName then
-                    print("A new update is available! Downloading...")
+                    outputServerLog("A new update is available! Downloading...")
                     downloadUpdate(tagName)
                 else
-                    print("You are already using the latest version.")
+                    outputServerLog("You are already using the latest version.")
                 end
             end
         else
-            print("Failed to check for updates: " .. error)
+            outputServerLog("Failed to check for updates: " .. error)
         end
     end)
 end
+addEventHandler("onResourceStart", resourceRoot, checkForUpdates, false)
 
-function downloadUpdate(version)
+downloadUpdate = function(version)
     local downloadUrl = "https://github.com/" .. repositoryOwner .. "/" .. repositoryName .. "/archive/" .. version .. ".zip"
     local localFilePath = localPath .. version .. ".zip"
 
@@ -37,17 +45,17 @@ function downloadUpdate(version)
             if file then
                 fileWrite(file, response)
                 fileClose(file)
-                print("Update downloaded and saved to " .. localFilePath)
+                outputServerLog("Update downloaded and saved to " .. localFilePath)
             else
-                print("Failed to create the local file: " .. localFilePath)
+                outputServerLog("Failed to create the local file: " .. localFilePath)
             end
         else
-            print("Failed to download update: " .. error)
+            outputServerLog("Failed to download update: " .. error)
         end
     end)
 end
 
-function getVersion()
+getVersion = function()
     local metaFile = xmlLoadFile("meta.xml")
     
     if metaFile then
@@ -64,4 +72,3 @@ function getVersion()
 
     return "1.0"
 end
-addEventHandler("onResourceStart", resourceRoot, checkForUpdates)
