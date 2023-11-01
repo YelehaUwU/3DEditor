@@ -1,5 +1,5 @@
 --[[
-	Made by Yeleha & waves
+	Made by Yeleha (Derbosik)
 
 	This file is part of 3DEditor.
 
@@ -10,12 +10,12 @@
 	You should have received a copy of the GNU General Public License along with 3DEditor. If not, see https://github.com/Derbosik/3DEditor/blob/main/LICENSE. 
 ]]
 
--- You can modify these keys
+-- You can modify these safely.
 local keyDragger = "mouse1"
 local keyUndo = "q"
 local keyRedo = "e"
 
--- Don't modify these if you don't know what you're doing
+-- Don't touch these if you don't know what you're doing.
 local sx, sy = guiGetScreenSize()
 local XYZlength = .5
 local sourceResElement
@@ -23,28 +23,65 @@ local sourceResElement
 local undoStack = {}
 local redoStack = {}
 local lastState
+local pAttached
+
+local disabledMoving
+local disabledRotating
+local disabledScaling
 
 
-function startEdit(elementik, sourceRes)
+function startEdit(elementik, disableMoving, disableRotate, disableScale, sourceRes)
 	element = elementik
 	if not isElement(element) or getElementType(element) == "player" or getElementType(element) == "vehicle" or isElement(info) then
 		return false
 	end
 	sourceResElement = nil
-	if not sourceRes then sourceResElement = sourceResource else sourceResElement = sourceRes end
+
+	if not sourceRes then
+		disabledMoving = disableMoving
+		disabledRotating = disableRotate
+		disabledScaling = disableScale
+		sourceResElement = sourceResource
+	else 
+		disabledMoving = disableMoving
+		disabledRotating = disableRotate
+		disabledScaling = disableScale
+		sourceResElement = sourceRes
+	end
+
 	local pos = 100
 	local dx, dy, dz = getElementPosition(element)
 	local drx, dry, drz = getElementRotation(element)
 	local dsx, dsy, dsz = getObjectScale(element)
 
+	local px, py, pz
+	local prx, pry, prz
+
+	if getResourceFromName(pAttachName) and getResourceState(getResourceFromName(pAttachName)) == "running" and exports[pAttachName]:isAttached(element) then
+		pAttached = true
+		local details = exports[pAttachName]:getDetails(element)
+		px = details[4]
+		py = details[5]
+		pz = details[6]
+		prx = details[7]
+		pry = details[8]
+		prz = details[9]
+	end
+
 	if not isEventHandlerAdded("onClientRender", root, drawControls) then
-		editing = true
+		if not disabledMoving then editing = true
+		elseif not disabledRotating then rotating = true
+		elseif not disabledScaling then sizing = true
+		else return false end
 		addEventHandler("onClientRender", root, drawControls)
 	end
 
 	bMove = guiCreateStaticImage( 770/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/move.png", false )
+	guiSetAlpha(bMove, disabledMoving and 0.25 or 1)
 	bRotate = guiCreateStaticImage( 850/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/rotate.png", false )
+	guiSetAlpha(bRotate, disabledRotating and 0.25 or 1)
 	bSize = guiCreateStaticImage( 930/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/size.png", false )
+	guiSetAlpha(bSize, disabledScaling and 0.25 or 1)
 	bBin = guiCreateStaticImage( 1010/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/bin.png", false )
 	bSave = guiCreateStaticImage( 1090/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/save.png", false )
 	info = guiCreateLabel(700/1920*sx, 1000/1080*sy, 0/1920*sx, 0/1080*sy, "EDITOR \nHold down SHIFT to move faster and hold down ALT to move slower",false)
@@ -53,40 +90,54 @@ function startEdit(elementik, sourceRes)
 
 	addEventHandler("onClientGUIClick",root,function(button,state)
 		if button=="left" and state=="up" then
-			if source == bMove then
-				guiSetAlpha(bRotate, 1)
-				guiSetAlpha(bSize, 1)
+			if source == bMove and not disabledMoving then
+				if not disabledRotating then guiSetAlpha(bRotate, 1) end
+				if not disabledScaling then guiSetAlpha(bSize, 1) end
 				rotating = false
 				editing = true
 				sizing = false
-			elseif source == bRotate then
-				guiSetAlpha(bMove, 1)
-				guiSetAlpha(bSize, 1)
+			elseif source == bRotate and not disabledRotating then
+				if not disabledMoving then guiSetAlpha(bMove, 1) end
+				if not disabledScaling then guiSetAlpha(bSize, 1) end
 				rotating = true
 				editing = false
 				sizing = false
-			elseif source == bSize then
-				guiSetAlpha(bRotate, 1)
-				guiSetAlpha(bMove, 1)
+			elseif source == bSize and not disabledScaling then
+				if not disabledRotating then guiSetAlpha(bRotate, 1) end
+				if not disabledMoving then guiSetAlpha(bMove, 1) end
 				rotating = false
 				editing = false
 				sizing = true
 			elseif source == bBin then
 				if isElement(element) then
-					setElementPosition(element, dx, dy, dz)
-					setElementRotation(element, drx, dry, drz)
 					setObjectScale(element, dsx, dsy, dsz)
-                    if not isElementLocal(element) then triggerServerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz) end
-					triggerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz)
+					if pAttached then
+						exports[pAttachName]:setPositionOffset(element, px, py, pz)
+						exports[pAttachName]:setRotationOffset(element, prx, pry, prz)
+						local details = exports[pAttachName]:getDetails(element)
+						if not isElementLocal(element) then triggerServerEvent("3DEditor:savedAttachedObject", resourceRoot, sourceResElement, element, px, py, pz, prx, pry, prz, dsx, dsy, dsz) end
+						triggerEvent("3DEditor:savedAttachedObject", localPlayer, sourceResElement, element, px, py, pz, prx, pry, prz, dsx, dsy, dsz)
+					else
+						setElementPosition(element, dx, dy, dz)
+						setElementRotation(element, drx, dry, drz)
+						if not isElementLocal(element) then triggerServerEvent("3DEditor:savedObject", resourceRoot, sourceResElement, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz) end
+						triggerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz)
+					end
 					closeMenu()
 				end
 			elseif source == bSave then
 				if isElement(element) then
-					local cx, cy, cz = getElementPosition(element)
-					local rx, ry, rz = getElementRotation(element)
 					local sx, sy, sz = getObjectScale(element)
-					if not isElementLocal(element) then triggerServerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, cx, cy, cz, rx, ry, rz, sx, sy, sz) end
-					triggerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
+					if pAttached then
+						local details = exports[pAttachName]:getDetails(element)
+						if not isElementLocal(element) then triggerServerEvent("3DEditor:savedAttachedObject", resourceRoot, sourceResElement, element, details[4], details[5], details[6], details[7], details[8], details[9], sx, sy, sz) end
+						triggerEvent("3DEditor:savedAttachedObject", localPlayer, sourceResElement, element, details[4], details[5], details[6], details[7], details[8], details[9], sx, sy, sz)
+					else
+						local cx, cy, cz = getElementPosition(element)
+						local rx, ry, rz = getElementRotation(element)
+						if not isElementLocal(element) then triggerServerEvent("3DEditor:savedObject", resourceRoot, sourceResElement, element, cx, cy, cz, rx, ry, rz, sx, sy, sz) end
+						triggerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
+					end
 					closeMenu()
 				end
 			end
@@ -156,7 +207,10 @@ end
 addEventHandler( "onClientMouseEnter", root, 
 	function(aX, aY)
 		if source == bMove or source == bRotate or source == bSize or source == bBin or source == bSave then
-			guiSetAlpha(source, 0.65)
+			if source == bMove and editing then return end
+			if source == bRotate and rotating then return end
+			if source == bSize and sizing then return end
+			guiSetAlpha(source, 0.5)
 		end
 	end
 )
@@ -167,6 +221,9 @@ addEventHandler( "onClientMouseLeave", root,
 			if source == bMove and editing then return end
 			if source == bRotate and rotating then return end
 			if source == bSize and sizing then return end
+			if source == bMove and disabledMoving then guiSetAlpha(source, 0.25) return end
+			if source == bRotate and disabledRotating then guiSetAlpha(source, 0.25) return end
+			if source == bSize and disabledScaling then guiSetAlpha(source, 0.25) return end
 			guiSetAlpha(source, 1)
 		end
 	end
@@ -174,15 +231,20 @@ addEventHandler( "onClientMouseLeave", root,
 
 function closeMenu()
 	redoStack = {}
-
 	undoStack = {}
+	pAttached = false
 
     removeEventHandler("onClientRender", root, drawControls)
     removeEventHandler("onClientCursorMove", root, cursorMove)
+
     rotating = false
     editing = true
     sizing = false
     element = nil
+	
+	disabledMoving = false
+	disabledRotating = false
+	disabledScaling = false
 
     destroyElement(bSize)
     destroyElement(bRotate)
@@ -244,8 +306,6 @@ addEventHandler("onClientKey", root, cursorRestore)
 function cursorMove(_,_,ax,ay)
 	if getKeyState(keyDragger) and isCursorShowing() and not t then
 		t = true
-		local cx, cy, cz = getElementPosition(element)
-		local rx, ry, rz = getElementRotation(element)
 		local distance1 = getDistance(mX, mY, ax, ay)
 		local distance2 = getDistance(mX, mY, oldX or absX, oldY or absY)
 
@@ -272,85 +332,178 @@ function cursorMove(_,_,ax,ay)
 			rotateSpeed = 9
 		end	
 
-		if editing then
-			if not (cx or cy or cz) then return end
-			if x then
-				if distance1>=distance2 then
-					setElementPosition(element, cx + moveSpeed, cy, cz)
-				else
-					setElementPosition(element, cx - moveSpeed, cy, cz)
+		if pAttached and exports[pAttachName]:isAttached(element) then
+			local details = exports[pAttachName]:getDetails(element)
+			local cx = details[4]
+			local cy = details[5]
+			local cz = details[6]
+			local rx = details[7]
+			local ry = details[8]
+			local rz = details[9]
+			if editing then
+				if not (cx or cy or cz) then return end
+				if x then
+					if distance1>=distance2 then
+						exports[pAttachName]:setPositionOffset(element, cx + moveSpeed, cy, cz)
+					else
+						exports[pAttachName]:setPositionOffset(element, cx - moveSpeed, cy, cz)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( dx, dy, dz )
+					setCursorPosition ( ix, iy )
+				elseif y then
+					if distance1>=distance2 then
+						exports[pAttachName]:setPositionOffset(element, cx, cy + moveSpeed, cz)
+					else
+						exports[pAttachName]:setPositionOffset(element, cx, cy - moveSpeed, cz)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( fx, fy, fz )
+					setCursorPosition ( ix, iy )
+				elseif z then
+					if distance1>=distance2 then
+						exports[pAttachName]:setPositionOffset(element,cx, cy, cz + moveSpeed)
+					else
+						exports[pAttachName]:setPositionOffset(element, cx, cy, cz - moveSpeed)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( ux, uy, uz )
+					setCursorPosition ( ix, iy )
 				end
-				local ix, iy =  getScreenFromWorldPosition ( dx, dy, dz )
-				setCursorPosition ( ix, iy )
-			elseif y then
-				if distance1>=distance2 then
-					setElementPosition(element, cx, cy + moveSpeed, cz)
-				else
-					setElementPosition(element, cx, cy - moveSpeed, cz)
+			elseif rotating then
+				if x then
+					if distance1>=distance2 then
+						exports[pAttachName]:setRotationOffset(element, rx + rotateSpeed, ry, rz)
+					else
+						exports[pAttachName]:setRotationOffset(element, rx - rotateSpeed, ry, rz)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( dx, dy, dz )
+					setCursorPosition ( ix, iy )
+				elseif y then
+					if distance1>=distance2 then
+						exports[pAttachName]:setRotationOffset(element, rx, ry + rotateSpeed, rz)
+					else
+						exports[pAttachName]:setRotationOffset(element, rx, ry - rotateSpeed, rz)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( fx, fy, fz )
+					setCursorPosition ( ix, iy )
+				elseif z then
+					if distance1>=distance2 then
+						exports[pAttachName]:setRotationOffset(element, rx, ry, rz + rotateSpeed)
+					else
+						exports[pAttachName]:setRotationOffset(element, rx, ry, rz - rotateSpeed)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( ux, uy, uz )
+					setCursorPosition ( ix, iy )
 				end
-				local ix, iy =  getScreenFromWorldPosition ( fx, fy, fz )
-				setCursorPosition ( ix, iy )
-			elseif z then
-				if distance1>=distance2 then
-					setElementPosition(element,cx, cy, cz + moveSpeed)
-				else
-					setElementPosition(element, cx, cy, cz - moveSpeed)
+			elseif sizing then
+				local s1, s2, s3 = getObjectScale( element )
+				if x then
+					if distance1>=distance2 then
+						setObjectScale(element, s1 + sizeSpeed, s2, s3)
+					else
+						setObjectScale(element, s1 - sizeSpeed, s2, s3)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( dx, dy, dz )
+					setCursorPosition ( ix, iy )
+				elseif y then
+					if distance1>=distance2 then
+						setObjectScale(element, s1, s2 + sizeSpeed, s3)
+					else
+						setObjectScale(element, s1, s2 - sizeSpeed, s3)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( fx, fy, fz )
+					setCursorPosition ( ix, iy )
+				elseif z then
+					if distance1>=distance2 then
+						setObjectScale(element, s1, s2, s3 + sizeSpeed)
+					else
+						setObjectScale(element, s1, s2, s3 - sizeSpeed)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( ux, uy, uz )
+					setCursorPosition ( ix, iy )
 				end
-				local ix, iy =  getScreenFromWorldPosition ( ux, uy, uz )
-				setCursorPosition ( ix, iy )
 			end
-		elseif rotating then
-			if x then
-				if distance1>=distance2 then
-					setElementRotation(element, rx + rotateSpeed, ry, rz)
-				else
-					setElementRotation(element, rx - rotateSpeed, ry, rz)
+		else
+			local cx, cy, cz = getElementPosition(element)
+			local rx, ry, rz = getElementRotation(element)
+			if editing then
+				if not (cx or cy or cz) then return end
+				if x then
+					if distance1>=distance2 then
+						setElementPosition(element, cx + moveSpeed, cy, cz)
+					else
+						setElementPosition(element, cx - moveSpeed, cy, cz)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( dx, dy, dz )
+					setCursorPosition ( ix, iy )
+				elseif y then
+					if distance1>=distance2 then
+						setElementPosition(element, cx, cy + moveSpeed, cz)
+					else
+						setElementPosition(element, cx, cy - moveSpeed, cz)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( fx, fy, fz )
+					setCursorPosition ( ix, iy )
+				elseif z then
+					if distance1>=distance2 then
+						setElementPosition(element,cx, cy, cz + moveSpeed)
+					else
+						setElementPosition(element, cx, cy, cz - moveSpeed)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( ux, uy, uz )
+					setCursorPosition ( ix, iy )
 				end
-				local ix, iy =  getScreenFromWorldPosition ( dx, dy, dz )
-				setCursorPosition ( ix, iy )
-			elseif y then
-				if distance1>=distance2 then
-					setElementRotation(element, rx, ry + rotateSpeed, rz)
-				else
-					setElementRotation(element, rx, ry - rotateSpeed, rz)
+			elseif rotating then
+				if x then
+					if distance1>=distance2 then
+						setElementRotation(element, rx + rotateSpeed, ry, rz)
+					else
+						setElementRotation(element, rx - rotateSpeed, ry, rz)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( dx, dy, dz )
+					setCursorPosition ( ix, iy )
+				elseif y then
+					if distance1>=distance2 then
+						setElementRotation(element, rx, ry + rotateSpeed, rz)
+					else
+						setElementRotation(element, rx, ry - rotateSpeed, rz)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( fx, fy, fz )
+					setCursorPosition ( ix, iy )
+				elseif z then
+					if distance1>=distance2 then
+						setElementRotation(element, rx, ry, rz + rotateSpeed)
+					else
+						setElementRotation(element, rx, ry, rz - rotateSpeed)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( ux, uy, uz )
+					setCursorPosition ( ix, iy )
 				end
-				local ix, iy =  getScreenFromWorldPosition ( fx, fy, fz )
-				setCursorPosition ( ix, iy )
-			elseif z then
-				if distance1>=distance2 then
-					setElementRotation(element, rx, ry, rz + rotateSpeed)
-				else
-					setElementRotation(element, rx, ry, rz - rotateSpeed)
+			elseif sizing then
+				local s1, s2, s3 = getObjectScale( element )
+				if x then
+					if distance1>=distance2 then
+						setObjectScale(element, s1 + sizeSpeed, s2, s3)
+					else
+						setObjectScale(element, s1 - sizeSpeed, s2, s3)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( dx, dy, dz )
+					setCursorPosition ( ix, iy )
+				elseif y then
+					if distance1>=distance2 then
+						setObjectScale(element, s1, s2 + sizeSpeed, s3)
+					else
+						setObjectScale(element, s1, s2 - sizeSpeed, s3)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( fx, fy, fz )
+					setCursorPosition ( ix, iy )
+				elseif z then
+					if distance1>=distance2 then
+						setObjectScale(element, s1, s2, s3 + sizeSpeed)
+					else
+						setObjectScale(element, s1, s2, s3 - sizeSpeed)
+					end
+					local ix, iy =  getScreenFromWorldPosition ( ux, uy, uz )
+					setCursorPosition ( ix, iy )
 				end
-				local ix, iy =  getScreenFromWorldPosition ( ux, uy, uz )
-				setCursorPosition ( ix, iy )
-			end
-		elseif sizing then
-			local s1, s2, s3 = getObjectScale( element )
-			if x then
-				if distance1>=distance2 then
-					setObjectScale(element, s1 + sizeSpeed, s2, s3)
-				else
-					setObjectScale(element, s1 - sizeSpeed, s2, s3)
-				end
-				local ix, iy =  getScreenFromWorldPosition ( dx, dy, dz )
-				setCursorPosition ( ix, iy )
-			elseif y then
-				if distance1>=distance2 then
-					setObjectScale(element, s1, s2 + sizeSpeed, s3)
-				else
-					setObjectScale(element, s1, s2 - sizeSpeed, s3)
-				end
-				local ix, iy =  getScreenFromWorldPosition ( fx, fy, fz )
-				setCursorPosition ( ix, iy )
-			elseif z then
-				if distance1>=distance2 then
-					setObjectScale(element, s1, s2, s3 + sizeSpeed)
-				else
-					setObjectScale(element, s1, s2, s3 - sizeSpeed)
-				end
-				local ix, iy =  getScreenFromWorldPosition ( ux, uy, uz )
-				setCursorPosition ( ix, iy )
 			end
 		end
 		setTimer(function()
@@ -365,11 +518,18 @@ end
 function stateControls(key, state)
 	if element then
 		local currentState = {
-			element = element,
 			position = {getElementPosition(element)},
 			rotation = {getElementRotation(element)},
 			scale = {getObjectScale(element)}
 		}
+		if pAttached then
+			local details = exports[pAttachName]:getDetails(element)
+			currentState = {
+				position = {details[4], details[5], details[6]},
+				rotation = {details[7], details[8], details[9]},
+				scale = {getObjectScale(element)}
+			}
+		end
 		if #undoStack == 0 or not areStatesEqual(currentState, undoStack[#undoStack]) then
 			table.insert(undoStack, currentState)
 		end
@@ -380,17 +540,29 @@ bindKey(keyDragger, "down", stateControls)
 function undo()
     if element and #undoStack > 0 then
         local currentState = {
-            element = element,
             position = {getElementPosition(element)},
             rotation = {getElementRotation(element)},
             scale = {getObjectScale(element)}
         }
+		if pAttached then
+			local details = exports[pAttachName]:getDetails(element)
+			currentState = {
+				position = {details[4], details[5], details[6]},
+				rotation = {details[7], details[8], details[9]},
+				scale = {getObjectScale(element)}
+			}
+		end
         table.insert(redoStack, currentState)
 
         local previousState = table.remove(undoStack)
-        setElementPosition(previousState.element, unpack(previousState.position))
-        setElementRotation(previousState.element, unpack(previousState.rotation))
-        setObjectScale(previousState.element, unpack(previousState.scale))
+		if pAttached then
+			exports[pAttachName]:setPositionOffset(element, unpack(previousState.position))
+			exports[pAttachName]:setRotationOffset(element, unpack(previousState.position))
+		else
+			setElementPosition(element, unpack(previousState.position))
+			setElementRotation(element, unpack(previousState.rotation))
+		end
+        setObjectScale(element, unpack(previousState.scale))
     end
 end
 bindKey(keyUndo, "down", undo)
@@ -398,17 +570,29 @@ bindKey(keyUndo, "down", undo)
 function redo()
     if element and #redoStack > 0 then
         local currentState = {
-            element = element,
             position = {getElementPosition(element)},
             rotation = {getElementRotation(element)},
             scale = {getObjectScale(element)}
         }
+		if pAttached then
+			local details = exports[pAttachName]:getDetails(element)
+			currentState = {
+				position = {details[4], details[5], details[6]},
+				rotation = {details[7], details[8], details[9]},
+				scale = {getObjectScale(element)}
+			}
+		end
         table.insert(undoStack, currentState)
 
         local nextState = table.remove(redoStack)
-        setElementPosition(nextState.element, unpack(nextState.position))
-        setElementRotation(nextState.element, unpack(nextState.rotation))
-        setObjectScale(nextState.element, unpack(nextState.scale))
+		if pAttached then
+			exports[pAttachName]:setPositionOffset(element, unpack(nextState.position))
+			exports[pAttachName]:setRotationOffset(element, unpack(nextState.position))
+		else
+			setElementPosition(element, unpack(nextState.position))
+			setElementRotation(element, unpack(nextState.rotation))
+		end
+        setObjectScale(element, unpack(nextState.scale))
     end
 end
 bindKey(keyRedo, "down", redo)
