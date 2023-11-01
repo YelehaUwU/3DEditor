@@ -46,7 +46,7 @@ Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is des
     ```lua
     function test(player)
        local obj = createObject(935, 0, 0, 0)
-       exports.3DEditor:startEdit(obj, [disableMoving, disableRotating, disableScaling], player)
+       exports.3DEditor:startEdit(obj, disableMoving, disableRotating, disableScaling, player)
     end
     addCommandHandler("testing", test)
 
