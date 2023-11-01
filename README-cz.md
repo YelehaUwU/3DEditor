@@ -42,7 +42,7 @@ Vítejte v repozitáři MTA:SA 3D Editoru! Tento zdrojový kód poskytuje snadno
     addEventHandler("onClientResourceStart", resourceRoot, test);
     ```
 
-    Příklad na straně serveru (Ujistěte se, že druhým argumentem je hráč, který určuje ovladač editoru)
+    Příklad na straně serveru (Ujistěte se, že vyplníte všechny argumenty, player je hráč který určuje ovladač editoru)
     ```lua
     function test(player)
        local obj = createObject(935, 0, 0, 0)
