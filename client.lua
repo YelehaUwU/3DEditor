@@ -10,11 +10,20 @@
 	You should have received a copy of the GNU General Public License along with 3DEditor. If not, see https://github.com/Derbosik/3DEditor/blob/main/LICENSE. 
 ]]
 
+-- You can modify these keys
+local keyDragger = "mouse1"
+local keyUndo = "q"
+local keyRedo = "e"
+
+-- Don't modify these if you don't know what you're doing
 local sx, sy = guiGetScreenSize()
 local XYZlength = .5
 local sourceResElement
 
-setCursorAlpha(255)
+local undoStack = {}
+local redoStack = {}
+local lastState
+
 
 function startEdit(elementik, sourceRes)
 	element = elementik
@@ -164,20 +173,24 @@ addEventHandler( "onClientMouseLeave", root,
 )
 
 function closeMenu()
-	removeEventHandler("onClientRender",root,drawControls)
-	removeEventHandler("onClientCursorMove",root,cursorMove)
-	rotating = false
-	editing = true
-	sizing = false	
-	element = nil
+	redoStack = {}
 
-	destroyElement(bSize)
-	destroyElement(bRotate)
-	destroyElement(bMove)
-	destroyElement(bBin)
-	destroyElement(bSave)
-	destroyElement(info)
-	showCursor(false)
+	undoStack = {}
+
+    removeEventHandler("onClientRender", root, drawControls)
+    removeEventHandler("onClientCursorMove", root, cursorMove)
+    rotating = false
+    editing = true
+    sizing = false
+    element = nil
+
+    destroyElement(bSize)
+    destroyElement(bRotate)
+    destroyElement(bMove)
+    destroyElement(bBin)
+    destroyElement(bSave)
+    destroyElement(info)
+    showCursor(false)
 end
 
 function click( button, state, absoluteX, absoluteY, worldX, worldY, worldZ, clickedElement )
@@ -185,7 +198,7 @@ function click( button, state, absoluteX, absoluteY, worldX, worldY, worldZ, cli
 	if isElement(element) then
 		if state == "down" then
 			local px,py,pz = getElementPosition( element )
-			if getKeyState( "mouse1" ) then
+			if getKeyState( keyDragger ) then
 				if (ix and iy and ix2 and iy2 and ix3 and iy3) then
 					if isMouseInPosition(ix-10,iy-10,20,20) or isMouseInPosition(ix3-10,iy3-10,20,20) or isMouseInPosition(ix2-10,iy2-10,20,20) then
 						if isMouseInPosition(ix-10,iy-10,20,20) then
@@ -229,7 +242,7 @@ end
 addEventHandler("onClientKey", root, cursorRestore)
 
 function cursorMove(_,_,ax,ay)
-	if getKeyState("mouse1") and isCursorShowing() and not t then
+	if getKeyState(keyDragger) and isCursorShowing() and not t then
 		t = true
 		local cx, cy, cz = getElementPosition(element)
 		local rx, ry, rz = getElementRotation(element)
@@ -261,7 +274,7 @@ function cursorMove(_,_,ax,ay)
 
 		if editing then
 			if not (cx or cy or cz) then return end
-			if x == true then
+			if x then
 				if distance1>=distance2 then
 					setElementPosition(element, cx + moveSpeed, cy, cz)
 				else
@@ -269,7 +282,7 @@ function cursorMove(_,_,ax,ay)
 				end
 				local ix, iy =  getScreenFromWorldPosition ( dx, dy, dz )
 				setCursorPosition ( ix, iy )
-			elseif y == true then
+			elseif y then
 				if distance1>=distance2 then
 					setElementPosition(element, cx, cy + moveSpeed, cz)
 				else
@@ -277,7 +290,7 @@ function cursorMove(_,_,ax,ay)
 				end
 				local ix, iy =  getScreenFromWorldPosition ( fx, fy, fz )
 				setCursorPosition ( ix, iy )
-			elseif z == true then
+			elseif z then
 				if distance1>=distance2 then
 					setElementPosition(element,cx, cy, cz + moveSpeed)
 				else
@@ -287,7 +300,7 @@ function cursorMove(_,_,ax,ay)
 				setCursorPosition ( ix, iy )
 			end
 		elseif rotating then
-			if x == true then
+			if x then
 				if distance1>=distance2 then
 					setElementRotation(element, rx + rotateSpeed, ry, rz)
 				else
@@ -295,7 +308,7 @@ function cursorMove(_,_,ax,ay)
 				end
 				local ix, iy =  getScreenFromWorldPosition ( dx, dy, dz )
 				setCursorPosition ( ix, iy )
-			elseif y == true then
+			elseif y then
 				if distance1>=distance2 then
 					setElementRotation(element, rx, ry + rotateSpeed, rz)
 				else
@@ -303,7 +316,7 @@ function cursorMove(_,_,ax,ay)
 				end
 				local ix, iy =  getScreenFromWorldPosition ( fx, fy, fz )
 				setCursorPosition ( ix, iy )
-			elseif z == true then
+			elseif z then
 				if distance1>=distance2 then
 					setElementRotation(element, rx, ry, rz + rotateSpeed)
 				else
@@ -314,7 +327,7 @@ function cursorMove(_,_,ax,ay)
 			end
 		elseif sizing then
 			local s1, s2, s3 = getObjectScale( element )
-			if x == true then
+			if x then
 				if distance1>=distance2 then
 					setObjectScale(element, s1 + sizeSpeed, s2, s3)
 				else
@@ -322,7 +335,7 @@ function cursorMove(_,_,ax,ay)
 				end
 				local ix, iy =  getScreenFromWorldPosition ( dx, dy, dz )
 				setCursorPosition ( ix, iy )
-			elseif y == true then
+			elseif y then
 				if distance1>=distance2 then
 					setObjectScale(element, s1, s2 + sizeSpeed, s3)
 				else
@@ -330,7 +343,7 @@ function cursorMove(_,_,ax,ay)
 				end
 				local ix, iy =  getScreenFromWorldPosition ( fx, fy, fz )
 				setCursorPosition ( ix, iy )
-			elseif z == true then
+			elseif z then
 				if distance1>=distance2 then
 					setObjectScale(element, s1, s2, s3 + sizeSpeed)
 				else
@@ -338,20 +351,71 @@ function cursorMove(_,_,ax,ay)
 				end
 				local ix, iy =  getScreenFromWorldPosition ( ux, uy, uz )
 				setCursorPosition ( ix, iy )
-			end			
+			end
 		end
 		setTimer(function()
 			t = false
-		end,25,1)
-	elseif (not isCursorShowing()) then
+		end, 25, 1)
+	elseif not isCursorShowing() then
 		setCursorAlpha(255)
 	end
 	oldX, oldY = ax, ay
 end
 
+function stateControls(key, state)
+	if element then
+		local currentState = {
+			element = element,
+			position = {getElementPosition(element)},
+			rotation = {getElementRotation(element)},
+			scale = {getObjectScale(element)}
+		}
+		if #undoStack == 0 or not areStatesEqual(currentState, undoStack[#undoStack]) then
+			table.insert(undoStack, currentState)
+		end
+	end
+end
+bindKey(keyDragger, "down", stateControls)
+
+function undo()
+    if element and #undoStack > 0 then
+        local currentState = {
+            element = element,
+            position = {getElementPosition(element)},
+            rotation = {getElementRotation(element)},
+            scale = {getObjectScale(element)}
+        }
+        table.insert(redoStack, currentState)
+
+        local previousState = table.remove(undoStack)
+        setElementPosition(previousState.element, unpack(previousState.position))
+        setElementRotation(previousState.element, unpack(previousState.rotation))
+        setObjectScale(previousState.element, unpack(previousState.scale))
+    end
+end
+bindKey(keyUndo, "down", undo)
+
+function redo()
+    if element and #redoStack > 0 then
+        local currentState = {
+            element = element,
+            position = {getElementPosition(element)},
+            rotation = {getElementRotation(element)},
+            scale = {getObjectScale(element)}
+        }
+        table.insert(undoStack, currentState)
+
+        local nextState = table.remove(redoStack)
+        setElementPosition(nextState.element, unpack(nextState.position))
+        setElementRotation(nextState.element, unpack(nextState.rotation))
+        setObjectScale(nextState.element, unpack(nextState.scale))
+    end
+end
+bindKey(keyRedo, "down", redo)
+
 --[[
 
-	Dependancies
+	Dependencies
 
 ]]
 
@@ -391,4 +455,17 @@ function getDistance(p1x, p1y, p2x, p2y)
 	else
 		return false
 	end
+end
+
+function areStatesEqual(state1, state2)
+    return state1.element == state2.element
+        and state1.position[1] == state2.position[1]
+        and state1.position[2] == state2.position[2]
+        and state1.position[3] == state2.position[3]
+        and state1.rotation[1] == state2.rotation[1]
+        and state1.rotation[2] == state2.rotation[2]
+        and state1.rotation[3] == state2.rotation[3]
+        and state1.scale[1] == state2.scale[1]
+        and state1.scale[2] == state2.scale[2]
+        and state1.scale[3] == state2.scale[3]
 end
