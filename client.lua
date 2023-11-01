@@ -10,11 +10,6 @@
 	You should have received a copy of the GNU General Public License along with 3DEditor. If not, see https://github.com/Derbosik/3DEditor/blob/main/LICENSE. 
 ]]
 
--- You can modify these safely.
-local keyDragger = "mouse1"
-local keyUndo = "q"
-local keyRedo = "e"
-
 -- Don't touch these if you don't know what you're doing.
 local sx, sy = guiGetScreenSize()
 local XYZlength = .5
@@ -569,7 +564,6 @@ function stateControls(key, state)
 		end
 	end
 end
-bindKey(keyDragger, "down", stateControls)
 
 function undo()
     if element and #undoStack > 0 then
@@ -599,7 +593,6 @@ function undo()
         setObjectScale(element, unpack(previousState.scale))
     end
 end
-bindKey(keyUndo, "down", undo)
 
 function redo()
     if element and #redoStack > 0 then
@@ -629,7 +622,13 @@ function redo()
         setObjectScale(element, unpack(nextState.scale))
     end
 end
-bindKey(keyRedo, "down", redo)
+
+function onResourceStart()
+	bindKey(keyDragger, "down", stateControls)
+	bindKey(keyUndo, "down", undo)
+	bindKey(keyRedo, "down", redo)
+end
+addEventHandler("onClientResourceStart", resourceRoot, onResourceStart)
 
 --[[
 

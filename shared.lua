@@ -10,4 +10,7 @@
 	You should have received a copy of the GNU General Public License along with 3DEditor. If not, see https://github.com/Derbosik/3DEditor/blob/main/LICENSE. 
 ]]
 
-local pAttachName = "pAttach"
+pAttachName = "pAttach"
+keyDragger = "mouse1"
+keyUndo = "q"
+keyRedo = "e"
