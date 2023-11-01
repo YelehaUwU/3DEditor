@@ -52,16 +52,16 @@ Vítejte v repozitáři MTA:SA 3D Editoru! Tento zdrojový kód poskytuje snadno
 
 5. Jakmile jste spokojeni se svou tvorbou, použijte tlačítko pro uložení.
 
-6. Bude spuštěna událost na serveru a klientovi, zde je třeba kontrolovat zdrojový zdroj (res) a aplikovat změny.
+6. Bude spuštěna událost na serveru a klientovi, zde je třeba kontrolovat zdrojový zdroj (res) (a "source" pokud na serveru) a aplikovat změny.
 
     Můžete implementovat uložení do MySQL/SQLite nebo jednoduše manipulovat s hodnotami dle libosti.
     ```lua
-    function listener(res, element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
-       if res == resource then
-          saveFurniturePosition(element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
+    function listener(res, object, cx, cy, cz, rx, ry, rz, sx, sy, sz)
+       if res == resource and source == player then
+          saveFurniturePosition(player, object, cx, cy, cz, rx, ry, rz, sx, sy, sz)
        end
     end
-    addEventHandler("3DEditor:savedObject", root, listener);
+    addEventHandler("3DEditor:savedObject", root, listener)
 
 ## Přispívání
 
