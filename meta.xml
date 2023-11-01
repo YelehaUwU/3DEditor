@@ -28,4 +28,9 @@
 	<file src="files/size.png" type="client"/>
 	<file src="files/bin.png" type="client"/>
 	<file src="files/save.png" type="client"/>
+
+    <!-- ACL permissions that this resource requires -->
+    <aclrequest>
+        <right name="function.fetchRemote" access="true" />
+    </aclrequest>
 </meta>
