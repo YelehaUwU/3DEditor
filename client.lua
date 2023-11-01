@@ -29,6 +29,8 @@ local disabledMoving
 local disabledRotating
 local disabledScaling
 
+local isSavingConfirmed = false
+local isTrashingConfirmed = false
 
 function startEdit(elementik, disableMoving, disableRotate, disableScale, sourceRes)
 	element = elementik
@@ -84,25 +86,34 @@ function startEdit(elementik, disableMoving, disableRotate, disableScale, source
 	guiSetAlpha(bSize, disabledScaling and 0.25 or 1)
 	bBin = guiCreateStaticImage( 1010/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/bin.png", false )
 	bSave = guiCreateStaticImage( 1090/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/save.png", false )
-	info = guiCreateLabel(700/1920*sx, 1000/1080*sy, 0/1920*sx, 0/1080*sy, "EDITOR \nHold down SHIFT to move faster and hold down ALT to move slower",false)
+	info = guiCreateLabel(780/1920*sx, 975/1080*sy, 500/1920*sx, 80/1080*sy, "Hold down SHIFT to move faster and hold down ALT to move slower\nHold down Right Mouse to move freely", false)
 
 	showCursor(true)
 
 	addEventHandler("onClientGUIClick",root,function(button,state)
 		if button=="left" and state=="up" then
 			if source == bMove and not disabledMoving then
+				guiSetText(info, "Hold down SHIFT to move faster and hold down ALT to move slower\nHold down Right Mouse to move freely")
+				isSavingConfirmed = false
+				isTrashingConfirmed = false
 				if not disabledRotating then guiSetAlpha(bRotate, 1) end
 				if not disabledScaling then guiSetAlpha(bSize, 1) end
 				rotating = false
 				editing = true
 				sizing = false
 			elseif source == bRotate and not disabledRotating then
+				guiSetText(info, "Hold down SHIFT to move faster and hold down ALT to move slower\nHold down Right Mouse to move freely")
+				isSavingConfirmed = false
+				isTrashingConfirmed = false
 				if not disabledMoving then guiSetAlpha(bMove, 1) end
 				if not disabledScaling then guiSetAlpha(bSize, 1) end
 				rotating = true
 				editing = false
 				sizing = false
 			elseif source == bSize and not disabledScaling then
+				guiSetText(info, "Hold down SHIFT to move faster and hold down ALT to move slower\nHold down Right Mouse to move freely")
+				isSavingConfirmed = false
+				isTrashingConfirmed = false
 				if not disabledRotating then guiSetAlpha(bRotate, 1) end
 				if not disabledMoving then guiSetAlpha(bMove, 1) end
 				rotating = false
@@ -110,37 +121,51 @@ function startEdit(elementik, disableMoving, disableRotate, disableScale, source
 				sizing = true
 			elseif source == bBin then
 				if isElement(element) then
-					setObjectScale(element, dsx, dsy, dsz)
-					if pAttached then
-						exports[pAttachName]:setPositionOffset(element, px, py, pz)
-						exports[pAttachName]:setRotationOffset(element, prx, pry, prz)
-						local details = exports[pAttachName]:getDetails(element)
-						if not isElementLocal(element) then triggerServerEvent("3DEditor:savedAttachedObject", resourceRoot, sourceResElement, element, px, py, pz, prx, pry, prz, dsx, dsy, dsz) end
-						triggerEvent("3DEditor:savedAttachedObject", localPlayer, sourceResElement, element, px, py, pz, prx, pry, prz, dsx, dsy, dsz)
+					if not isTrashingConfirmed then
+						guiSetText(info, "Are you sure you want to trash the changes?")
+						isTrashingConfirmed = true
 					else
-						setElementPosition(element, dx, dy, dz)
-						setElementRotation(element, drx, dry, drz)
-						if not isElementLocal(element) then triggerServerEvent("3DEditor:savedObject", resourceRoot, sourceResElement, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz) end
-						triggerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz)
+						setObjectScale(element, dsx, dsy, dsz)
+						if pAttached then
+							exports[pAttachName]:setPositionOffset(element, px, py, pz)
+							exports[pAttachName]:setRotationOffset(element, prx, pry, prz)
+							local details = exports[pAttachName]:getDetails(element)
+							if not isElementLocal(element) then triggerServerEvent("3DEditor:savedAttachedObject", resourceRoot, sourceResElement, element, px, py, pz, prx, pry, prz, dsx, dsy, dsz) end
+							triggerEvent("3DEditor:savedAttachedObject", localPlayer, sourceResElement, element, px, py, pz, prx, pry, prz, dsx, dsy, dsz)
+						else
+							setElementPosition(element, dx, dy, dz)
+							setElementRotation(element, drx, dry, drz)
+							if not isElementLocal(element) then triggerServerEvent("3DEditor:savedObject", resourceRoot, sourceResElement, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz) end
+							triggerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, dx, dy, dz, drx, dry, drz, dsx, dsy, dsz)
+						end
+						closeMenu()
 					end
-					closeMenu()
 				end
 			elseif source == bSave then
-				if isElement(element) then
-					local sx, sy, sz = getObjectScale(element)
-					if pAttached then
-						local details = exports[pAttachName]:getDetails(element)
-						if not isElementLocal(element) then triggerServerEvent("3DEditor:savedAttachedObject", resourceRoot, sourceResElement, element, details[4], details[5], details[6], details[7], details[8], details[9], sx, sy, sz) end
-						triggerEvent("3DEditor:savedAttachedObject", localPlayer, sourceResElement, element, details[4], details[5], details[6], details[7], details[8], details[9], sx, sy, sz)
-					else
-						local cx, cy, cz = getElementPosition(element)
-						local rx, ry, rz = getElementRotation(element)
-						if not isElementLocal(element) then triggerServerEvent("3DEditor:savedObject", resourceRoot, sourceResElement, element, cx, cy, cz, rx, ry, rz, sx, sy, sz) end
-						triggerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
-					end
-					closeMenu()
-				end
-			end
+                if isElement(element) then
+                    if not isSavingConfirmed then
+                        guiSetText(info, "Are you sure you want to save the changes?")
+						isSavingConfirmed = true
+                    else
+                        local sx, sy, sz = getObjectScale(element)
+                        if pAttached then
+                            local details = exports[pAttachName]:getDetails(element)
+                            if not isElementLocal(element) then
+                                triggerServerEvent("3DEditor:savedAttachedObject", resourceRoot, sourceResElement, element, details[4], details[5], details[6], details[7], details[8], details[9], sx, sy, sz)
+                            end
+                            triggerEvent("3DEditor:savedAttachedObject", localPlayer, sourceResElement, element, details[4], details[5], details[6], details[7], details[8], details[9], sx, sy, sz)
+                        else
+                            local cx, cy, cz = getElementPosition(element)
+                            local rx, ry, rz = getElementRotation(element)
+                            if not isElementLocal(element) then
+                                triggerServerEvent("3DEditor:savedObject", resourceRoot, sourceResElement, element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
+                            end
+                            triggerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
+                        end
+                        closeMenu()
+                    end
+                end
+            end
 		end
 	end)
 end
@@ -189,14 +214,17 @@ function drawControls()
 					blue = tocolor( 0, 0, 150, 255 )
 				end
 
-				dxDrawLine ( ix, iy, mX, mY, red, 2, false)
-				dxDrawImage ( ix-10, iy-10, 20, 20, 'files/'..xImage..'.png', 0, 0, 0, tocolor( 255, 255, 255, 230 ), false )
+				dxDrawLine(ix, iy, mX, mY, red, 2, false)
+				dxDrawImage(ix - 10, iy - 10, 20, 20, 'files/'..xImage..'.png', 0, 0, 0, tocolor(255, 255, 255, 230), false)
+				dxDrawText("X", ix + 25, iy - 10, ix + 25, iy + 10, tocolor(255, 255, 255, 230), 0.65, "bankgothic", "center", "center", false)
 
-				dxDrawLine ( ix2, iy2, mX, mY, green, 2, false)
-				dxDrawImage ( ix2-10, iy2-10, 20, 20, 'files/'..yImage..'.png', 0, 0, 0, tocolor( 255, 255, 255, 230 ), false )
+				dxDrawLine(ix2, iy2, mX, mY, green, 2, false)
+				dxDrawImage(ix2 - 10, iy2 - 10, 20, 20, 'files/'..yImage..'.png', 0, 0, 0, tocolor(255, 255, 255, 230), false)
+				dxDrawText("Y", ix2 + 25, iy2 - 10, ix2 + 25, iy2 + 10, tocolor(255, 255, 255, 230), 0.65, "bankgothic", "center", "center", false)
 
-				dxDrawLine ( ix3, iy3, mX, mY, blue, 2, false)
-				dxDrawImage ( ix3-10, iy3-10, 20, 20, 'files/'..zImage..'.png', 0, 0, 0, tocolor( 255, 255, 255, 230 ), false )
+				dxDrawLine(ix3, iy3, mX, mY, blue, 2, false)
+				dxDrawImage(ix3 - 10, iy3 - 10, 20, 20, 'files/'..zImage..'.png', 0, 0, 0, tocolor(255, 255, 255, 230), false)
+				dxDrawText("Z", ix3 + 25, iy3 - 10, ix3 + 25, iy3 + 10, tocolor(255, 255, 255, 230), 0.65, "bankgothic", "center", "center", false)
 			end
 		end
 	else
@@ -218,6 +246,9 @@ addEventHandler( "onClientMouseEnter", root,
 addEventHandler( "onClientMouseLeave", root, 
 	function(aX, aY)
 		if source == bMove or source == bRotate or source == bSize or source == bBin or source == bSave then
+			guiSetText(info, "Hold down SHIFT to move faster and hold down ALT to move slower\nHold down Right Mouse to move freely")
+			isSavingConfirmed = false
+			isTrashingConfirmed = false
 			if source == bMove and editing then return end
 			if source == bRotate and rotating then return end
 			if source == bSize and sizing then return end
@@ -245,6 +276,9 @@ function closeMenu()
 	disabledMoving = false
 	disabledRotating = false
 	disabledScaling = false
+
+	isSavingConfirmed = false
+	isTrashingConfirmed = false
 
     destroyElement(bSize)
     destroyElement(bRotate)
