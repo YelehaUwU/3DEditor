@@ -4,6 +4,8 @@
 
 Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is designed to provide an easy-to-use tool for editing 3D objects within Multi Theft Auto: San Andreas (MTA:SA). Whether you're a seasoned MTA developer or just starting out, this resource aims to simplify the process of editing 3D objects on your MTA server.
 
+<img src="https://github.com/Derbosik/3DEditor/assets/99475875/36ae3e16-e87a-439b-9588-cf0c1a3d1a1c" alt="Showcase" width="350">
+
 ## Features
 
 - **Intuitive Interface:** The 3D Object Editor comes with a user-friendly interface that makes editing objects a breeze.
