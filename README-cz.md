@@ -9,6 +9,8 @@ Vítejte v repozitáři MTA:SA 3D Editoru! Tento zdrojový kód poskytuje snadno
 - **Intuitivní Rozhraní:** 3D Editor objektů má uživatelsky přívětivé rozhraní, které zjednodušuje editaci objektů.
 - **Náhled v Reálném Čase:** V reálném čase vidíte změny, které provádíte na vlastnostech objektu.
 - **Přizpůsobení:** Upravte vlastnosti objektu, jako je pozice, rotace a měřítko.
+- **Udělal jsem chybu**: Vezměte zpět a znovu proveďte úpravy a ujistěte se, že jste zůstali v souladu s tím, co jste chtěli.
+- **Vše podle vašich představ**: Vypněte některé funkce, pokud se vám to hodí.
 - **Možnosti Exportu:** Hloubkově integrujte zdrojový kód do svého serveru dle vašich přání.
 
 ## Instalace
@@ -35,7 +37,7 @@ Vítejte v repozitáři MTA:SA 3D Editoru! Tento zdrojový kód poskytuje snadno
     ```lua
     function test()
        local obj = createObject(935, 0, 0, 0)
-       exports.3DEditor:startEdit(obj)
+       exports.3DEditor:startEdit(obj, [disableMoving, disableRotating, disableScaling])
     end
     addEventHandler("onClientResourceStart", resourceRoot, test);
     ```
@@ -44,7 +46,7 @@ Vítejte v repozitáři MTA:SA 3D Editoru! Tento zdrojový kód poskytuje snadno
     ```lua
     function test(player)
        local obj = createObject(935, 0, 0, 0)
-       exports.3DEditor:startEdit(obj, player)
+       exports.3DEditor:startEdit(obj, [disableMoving, disableRotating, disableScaling]), player)
     end
     addCommandHandler("testing", test)
 
