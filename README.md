@@ -56,9 +56,9 @@ Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is des
 
     You can implement saving to MySQL/SQLite or just manipulate with the values however you please.
     ```lua
-    function listener(res, element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
-       if res == resource then
-          saveFurniturePosition(element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
+    function listener(res, object, cx, cy, cz, rx, ry, rz, sx, sy, sz)
+       if res == resource and source == player then
+          saveFurniturePosition(player, object, cx, cy, cz, rx, ry, rz, sx, sy, sz)
        end
     end
     addEventHandler("3DEditor:savedObject", root, listener)
