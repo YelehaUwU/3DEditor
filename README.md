@@ -52,7 +52,7 @@ Welcome to the MTA:SA 3D Object Editor Resource repository! This resource is des
 
 5. Once you're satisfied with your creation, use the save button.
 
-6. A server and client event is going to be triggered, this is where you need to check for the (res) and apply your changes.
+6. A server and client event is going to be triggered, this is where you need to check for the (res) (and "source" if on the server) and apply your changes.
 
     You can implement saving to MySQL/SQLite or just manipulate with the values however you please.
     ```lua
