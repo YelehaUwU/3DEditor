@@ -46,7 +46,7 @@ Vítejte v repozitáři MTA:SA 3D Editoru! Tento zdrojový kód poskytuje snadno
     ```lua
     function test(player)
        local obj = createObject(935, 0, 0, 0)
-       exports.3DEditor:startEdit(obj, [disableMoving, disableRotating, disableScaling]), player)
+       exports.3DEditor:startEdit(obj, disableMoving, disableRotating, disableScaling, player)
     end
     addCommandHandler("testing", test)
 
