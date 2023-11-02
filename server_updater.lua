@@ -5,7 +5,8 @@ local localPath = "updates/"
 
 local outputServerLog_ = outputServerLog
 local outputServerLog = function(message)
-    outputServerLog_("[ " .. repositoryName .. "] » " .. message)
+    outputServerLog_("[" .. repositoryName .. "] » " .. message)
+    print("[" .. repositoryName .. "] » " .. message)
 end
 
 local checkForUpdates, downloadUpdate, getVersion
