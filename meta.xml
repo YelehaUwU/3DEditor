@@ -2,7 +2,7 @@
 	<info author="Yeleha"
 	name="3DEditor"
 	description="Library for manipulating with objects"
-	version="4.0"
+	version="4.5"
 	type="script"/>
 
 	<script src="server.lua" type="server"/>
