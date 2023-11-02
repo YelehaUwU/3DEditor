@@ -10,7 +10,7 @@
 	You should have received a copy of the GNU General Public License along with 3DEditor. If not, see https://github.com/Derbosik/3DEditor/blob/main/LICENSE. 
 ]]
 
-function startEdit(element, controller, disableMoving, disableRotate, disableScale)
+function startEdit(element, disableMoving, disableRotate, disableScale, controller)
 	if isElement(element) and isElement(controller) then triggerClientEvent(controller, "3DEditor:startEdit", controller, element, disableMoving and true or false, disableRotate and true or false, disableScale and true or false, sourceResource) end
 end
 
