@@ -11,108 +11,140 @@
 ]]
 
 -- Don't touch these if you don't know what you're doing.
+
+-- Constants
 local sx, sy = guiGetScreenSize()
-local XYZlength = .5
+local XYZlength = 0.5
 local sourceResElement
 
+-- Edit Mode Variables
 local undoStack = {}
 local redoStack = {}
 local lastState
 local pAttached
 
+-- Control State Variables
 local disabledMoving
 local disabledRotating
 local disabledScaling
 
+-- Confirmation Flags
 local isSavingConfirmed = false
 local isTrashingConfirmed = false
 
+-- Function to Start Editing
 function startEdit(elementik, disableMoving, disableRotate, disableScale, sourceRes)
 	element = elementik
-	if not isElement(element) or getElementType(element) == "player" or getElementType(element) == "vehicle" or isElement(info) then
-		return false
-	end
-	sourceResElement = nil
+    -- Ensure that the provided element is valid and not a player or vehicle
+    if not isElement(element) or getElementType(element) == "player" or getElementType(element) == "vehicle" or isElement(info) then
+        return false
+    end
+    
+    -- Set source resource element based on input or default to sourceResource
+    sourceResElement = sourceRes or sourceResource
+    disabledMoving = disableMoving
+    disabledRotating = disableRotate
+    disabledScaling = disableScale
+    
+    -- Initialize variables for position, rotation, scale, and attached object details
+    local pos = 100
+    local dx, dy, dz = getElementPosition(element)
+    local drx, dry, drz = getElementRotation(element)
+    local dsx, dsy, dsz = getObjectScale(element)
+    
+    local px, py, pz
+    local prx, pry, prz
+    
+    if getResourceFromName(pAttachName) and getResourceState(getResourceFromName(pAttachName)) == "running" and exports[pAttachName]:isAttached(element) then
+        pAttached = true
+        local details = exports[pAttachName]:getDetails(element)
+        px, py, pz = details[4], details[5], details[6]
+        prx, pry, prz = details[7], details[8], details[9]
+    end
+    
+    -- Create GUI control buttons
+    bMove = guiCreateStaticImage(770/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/move.png", false)
+    guiSetAlpha(bMove, disabledMoving and 0.25 or 1)
+    
+    bRotate = guiCreateStaticImage(850/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/rotate.png", false)
+    guiSetAlpha(bRotate, disabledRotating and 0.25 or 1)
+    
+    bSize = guiCreateStaticImage(930/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/size.png", false)
+    guiSetAlpha(bSize, disabledScaling and 0.25 or 1)
+    
+    bBin = guiCreateStaticImage(1010/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/bin.png", false)
+    bSave = guiCreateStaticImage(1090/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/save.png", false)
+    
+    info = guiCreateLabel(780/1920*sx, 975/1080*sy, 500/1920*sx, 80/1080*sy, "Hold down SHIFT to move faster and hold down ALT to move slower\nHold down Right Mouse to move freely", false)
+    
+    -- Determine the edit mode and start the corresponding event handler
+    if not isEventHandlerAdded("onClientRender", root, drawControls) then
+        if not disabledMoving then
+            editing = true
+			guiSetAlpha(bMove, 0.75)
+        elseif not disabledRotating then
+            rotating = true
+			guiSetAlpha(bRotate, 0.75)
+        elseif not disabledScaling then
+            sizing = true
+			guiSetAlpha(bSize, 0.75)
+        else
+            return false
+        end
+        addEventHandler("onClientRender", root, drawControls)
+    end
 
-	if not sourceRes then
-		disabledMoving = disableMoving
-		disabledRotating = disableRotate
-		disabledScaling = disableScale
-		sourceResElement = sourceResource
-	else 
-		disabledMoving = disableMoving
-		disabledRotating = disableRotate
-		disabledScaling = disableScale
-		sourceResElement = sourceRes
-	end
+    showCursor(true)
 
-	local pos = 100
-	local dx, dy, dz = getElementPosition(element)
-	local drx, dry, drz = getElementRotation(element)
-	local dsx, dsy, dsz = getObjectScale(element)
-
-	local px, py, pz
-	local prx, pry, prz
-
-	if getResourceFromName(pAttachName) and getResourceState(getResourceFromName(pAttachName)) == "running" and exports[pAttachName]:isAttached(element) then
-		pAttached = true
-		local details = exports[pAttachName]:getDetails(element)
-		px = details[4]
-		py = details[5]
-		pz = details[6]
-		prx = details[7]
-		pry = details[8]
-		prz = details[9]
-	end
-
-	if not isEventHandlerAdded("onClientRender", root, drawControls) then
-		if not disabledMoving then editing = true
-		elseif not disabledRotating then rotating = true
-		elseif not disabledScaling then sizing = true
-		else return false end
-		addEventHandler("onClientRender", root, drawControls)
-	end
-
-	bMove = guiCreateStaticImage( 770/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/move.png", false )
-	guiSetAlpha(bMove, disabledMoving and 0.25 or 1)
-	bRotate = guiCreateStaticImage( 850/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/rotate.png", false )
-	guiSetAlpha(bRotate, disabledRotating and 0.25 or 1)
-	bSize = guiCreateStaticImage( 930/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/size.png", false )
-	guiSetAlpha(bSize, disabledScaling and 0.25 or 1)
-	bBin = guiCreateStaticImage( 1010/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/bin.png", false )
-	bSave = guiCreateStaticImage( 1090/1920*sx, 900/1080*sy, 70/1920*sx, 70/1080*sy, "files/save.png", false )
-	info = guiCreateLabel(780/1920*sx, 975/1080*sy, 500/1920*sx, 80/1080*sy, "Hold down SHIFT to move faster and hold down ALT to move slower\nHold down Right Mouse to move freely", false)
-
-	showCursor(true)
-
-	addEventHandler("onClientGUIClick",root,function(button,state)
-		if button=="left" and state=="up" then
+	function onClick(button, state)
+		if button == "left" and state == "up" then
 			if source == bMove and not disabledMoving then
+				-- Set the information text and reset confirmation flags
 				guiSetText(info, "Hold down SHIFT to move faster and hold down ALT to move slower\nHold down Right Mouse to move freely")
 				isSavingConfirmed = false
 				isTrashingConfirmed = false
-				if not disabledRotating then guiSetAlpha(bRotate, 1) end
-				if not disabledScaling then guiSetAlpha(bSize, 1) end
+				
+				-- Handle edit mode transitions
+				if not disabledRotating then
+					guiSetAlpha(bRotate, 1)
+				end
+				if not disabledScaling then
+					guiSetAlpha(bSize, 1)
+				end
 				rotating = false
 				editing = true
 				sizing = false
 			elseif source == bRotate and not disabledRotating then
+				-- Set the information text and reset confirmation flags
 				guiSetText(info, "Hold down SHIFT to move faster and hold down ALT to move slower\nHold down Right Mouse to move freely")
 				isSavingConfirmed = false
 				isTrashingConfirmed = false
-				if not disabledMoving then guiSetAlpha(bMove, 1) end
-				if not disabledScaling then guiSetAlpha(bSize, 1) end
-				rotating = true
+				
+				-- Handle edit mode transitions
+				if not disabledMoving then
+					guiSetAlpha(bMove, 1)
+				end
+				if not disabledScaling then
+					guiSetAlpha(bSize, 1)
+				end
 				editing = false
+				rotating = true
 				sizing = false
 			elseif source == bSize and not disabledScaling then
+				-- Set the information text and reset confirmation flags
 				guiSetText(info, "Hold down SHIFT to move faster and hold down ALT to move slower\nHold down Right Mouse to move freely")
 				isSavingConfirmed = false
 				isTrashingConfirmed = false
-				if not disabledRotating then guiSetAlpha(bRotate, 1) end
-				if not disabledMoving then guiSetAlpha(bMove, 1) end
-				rotating = false
+				
+				-- Handle edit mode transitions
+				if not disabledMoving then
+					guiSetAlpha(bMove, 1)
+				end
+				if not disabledRotating then
+					guiSetAlpha(bRotate, 1)
+				end
 				editing = false
+				rotating = false
 				sizing = true
 			elseif source == bBin then
 				if isElement(element) then
@@ -137,32 +169,37 @@ function startEdit(elementik, disableMoving, disableRotate, disableScale, source
 					end
 				end
 			elseif source == bSave then
-                if isElement(element) then
-                    if not isSavingConfirmed then
-                        guiSetText(info, "Are you sure you want to save the changes?")
+				if isElement(element) then
+					if not isSavingConfirmed then
+						guiSetText(info, "Are you sure you want to save the changes?")
 						isSavingConfirmed = true
-                    else
-                        local sx, sy, sz = getObjectScale(element)
-                        if pAttached then
-                            local details = exports[pAttachName]:getDetails(element)
-                            if not isElementLocal(element) then
-                                triggerServerEvent("3DEditor:savedAttachedObject", resourceRoot, sourceResElement, element, details[4], details[5], details[6], details[7], details[8], details[9], sx, sy, sz)
-                            end
-                            triggerEvent("3DEditor:savedAttachedObject", localPlayer, sourceResElement, element, details[4], details[5], details[6], details[7], details[8], details[9], sx, sy, sz)
-                        else
-                            local cx, cy, cz = getElementPosition(element)
-                            local rx, ry, rz = getElementRotation(element)
-                            if not isElementLocal(element) then
-                                triggerServerEvent("3DEditor:savedObject", resourceRoot, sourceResElement, element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
-                            end
-                            triggerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
-                        end
-                        closeMenu()
-                    end
-                end
-            end
+					else
+						local sx, sy, sz = getObjectScale(element)
+						if pAttached then
+							local details = exports[pAttachName]:getDetails(element)
+							if not isElementLocal(element) then
+								triggerServerEvent("3DEditor:savedAttachedObject", resourceRoot, sourceResElement, element, details[4], details[5], details[6], details[7], details[8], details[9], sx, sy, sz)
+							end
+							triggerEvent("3DEditor:savedAttachedObject", localPlayer, sourceResElement, element, details[4], details[5], details[6], details[7], details[8], details[9], sx, sy, sz)
+						else
+							local cx, cy, cz = getElementPosition(element)
+							local rx, ry, rz = getElementRotation(element)
+							if not isElementLocal(element) then
+								triggerServerEvent("3DEditor:savedObject", resourceRoot, sourceResElement, element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
+							end
+							triggerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, cx, cy, cz, rx, ry, rz, sx, sy, sz)
+						end
+						closeMenu()
+					end
+				end
+			end
 		end
-	end)
+	end
+    
+    -- Add event handler for GUI clicks
+	if not isEventHandlerAdded("onClientGUIClick", root, onClick) then
+		addEventHandler("onClientGUIClick", root, onClick)
+	end
 end
 addEvent("3DEditor:startEdit", true)
 addEventHandler("3DEditor:startEdit", root, startEdit)
@@ -230,10 +267,10 @@ end
 addEventHandler( "onClientMouseEnter", root, 
 	function(aX, aY)
 		if source == bMove or source == bRotate or source == bSize or source == bBin or source == bSave then
-			if source == bMove and editing then return end
-			if source == bRotate and rotating then return end
-			if source == bSize and sizing then return end
-			guiSetAlpha(source, 0.5)
+			if source == bMove and (editing or disabledMoving) then return end
+			if source == bRotate and (rotating or disabledRotating) then return end
+			if source == bSize and (sizing or disabledScaling) then return end
+			guiSetAlpha(source, 0.75)
 		end
 	end
 )
@@ -262,6 +299,7 @@ function closeMenu()
 
     removeEventHandler("onClientRender", root, drawControls)
     removeEventHandler("onClientCursorMove", root, cursorMove)
+	removeEventHandler("onClientGUIClick", root, onClick)
 
     rotating = false
     editing = true
@@ -636,20 +674,28 @@ addEventHandler("onClientResourceStart", resourceRoot, onResourceStart)
 
 ]]
 
-function getPositionFromElementOffset(element,offX,offY,offZ)
-    local m = getElementMatrix(element)
-    return offX*m[1][1]+offY*m[2][1]+offZ*m[3][1]+m[4][1],offX*m[1][2]+offY*m[2][2]+offZ*m[3][2]+m[4][2],offX*m[1][3]+offY*m[2][3]+offZ*m[3][3]+m[4][3]
+function getPositionFromElementOffset(element, offX, offY, offZ)
+	local m = getElementMatrix(element)
+	local m11, m12, m13 = m[1][1], m[1][2], m[1][3]
+	local m21, m22, m23 = m[2][1], m[2][2], m[2][3]
+	local m31, m32, m33 = m[3][1], m[3][2], m[3][3]
+	local m41, m42, m43 = m[4][1], m[4][2], m[4][3]
+	
+	return offX * m11 + offY * m21 + offZ * m31 + m41,
+		   offX * m12 + offY * m22 + offZ * m32 + m42,
+		   offX * m13 + offY * m23 + offZ * m33 + m43
 end
 
-function isMouseInPosition (x, y, width, height)
+function isMouseInPosition(x, y, width, height)
 	if not isCursorShowing() then
 		return false
 	end
+	
 	local sx, sy = guiGetScreenSize()
 	local cx, cy = getCursorPosition()
-	local cx, cy = ( cx * sx ), ( cy * sy )
+	cx, cy = cx * sx, cy * sy
 	
-	return ( ( cx >= x and cx <= x + width ) and ( cy >= y and cy <= y + height ) )
+	return cx >= x and cx <= x + width and cy >= y and cy <= y + height
 end
 
 function isEventHandlerAdded(sEventName, pElementAttachedTo, func)
