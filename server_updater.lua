@@ -1,4 +1,4 @@
-local repositoryOwner = "Derbosik"
+local repositoryOwner = "YelehaUwU"
 local repositoryName = "3DEditor"
 
 local localPath = "updates/"
