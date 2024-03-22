@@ -77,7 +77,7 @@ Tento projekt je licencován pod licencí [GNU General Public License verze 3.0]
 
 ## Autoři
 
-- [Derbosik](https://github.com/Derbosik) & [Nando](https://github.com/Fernando-A-Rocha) - Vedoucí vývojáři
+- [YelehaUwU](https://github.com/YelehaUwU) & [Nando](https://github.com/Fernando-A-Rocha) - Vedoucí vývojáři
 - [wavesk](https://github.com/wavesk) & [Denas1](https://github.com/Denas1) - Poskytování nápadů na vylepšení
 
 Speciální poděkování komunitě MTA za jejich podporu a inspiraci.
