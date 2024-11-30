@@ -4,7 +4,7 @@
 
 Vítejte v repozitáři MTA:SA 3D Editoru! Tento zdrojový kód poskytuje snadno použitelný nástroj pro editaci 3D objektů ve hře Multi Theft Auto: San Andreas (MTA:SA). Ať už jste zkušený vývojář pro MTA nebo teprve začínáte, tento zdrojový kód si klade za cíl zjednodušit proces editace 3D objektů na vašem MTA serveru.
 
-<img src="https://github.com/Derbosik/3DEditor/assets/99475875/36ae3e16-e87a-439b-9588-cf0c1a3d1a1c" alt="Showcase" width="350">
+<img src="https://github.com/YelehaUwU/3DEditor/assets/99475875/36ae3e16-e87a-439b-9588-cf0c1a3d1a1c" alt="Showcase" width="350">
 
 ## Funkce
 
@@ -17,7 +17,7 @@ Vítejte v repozitáři MTA:SA 3D Editoru! Tento zdrojový kód poskytuje snadno
 
 ## Instalace
 
-1. Stáhněte nejnovější verzi zdrojového kódu ze sekce [Releases](https://github.com/Derbosik/3DEditor/releases).
+1. Stáhněte nejnovější verzi zdrojového kódu ze sekce [Releases](https://github.com/YelehaUwU/3DEditor/releases).
 2. Rozbalte stažený archiv.
 3. Umístěte rozbalenou složku do adresáře `resources` na vašem MTA:SA serveru.
 4. Přidejte zdrojový kód do konfiguračního souboru vašeho serveru (`mtaserver.conf`) pod sekci `resources`:
@@ -84,4 +84,4 @@ Speciální poděkování komunitě MTA za jejich podporu a inspiraci.
 
 ---
 
-Doufáme, že si užijete používání MTA:SA 3D Editoru! Pokud narazíte na nějaké problémy nebo máte otázky, neváhejte [otevřít požadavku](https://github.com/Derbosik/3DEditor/issues). Šťastné editování objektů!
+Doufáme, že si užijete používání MTA:SA 3D Editoru! Pokud narazíte na nějaké problémy nebo máte otázky, neváhejte [otevřít požadavku](https://github.com/YelehaUwU/3DEditor/issues). Šťastné editování objektů!

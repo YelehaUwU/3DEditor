@@ -7,7 +7,7 @@
 
 	<script src="server.lua" type="server"/>
 	<script src="server_updater.lua" type="server"/>
-	<script src="shared.lua" type="shared"/>
+	<script src="config.lua" type="shared"/>
 	<script src="client.lua" type="client"/>
 
 	<export function="startEdit" type="server"/>
