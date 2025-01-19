@@ -198,7 +198,7 @@ function startEdit(elementik, disableMoving, disableRotate, disableScale, source
 							local cx, cy, cz = getElementPosition(element)
 							local rx, ry, rz = getElementRotation(element)
 							if not isElementLocal(element) then
-								triggerServerEvent("3DEditor:savedObject", resourceRoot, sourceResElement, element, cx,
+								triggerServerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, cx,
 									cy, cz, rx, ry, rz, sx2, sy2, sz2)
 							end
 							triggerEvent("3DEditor:savedObject", localPlayer, sourceResElement, element, cx, cy, cz, rx,
